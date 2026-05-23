@@ -2563,7 +2563,7 @@ index 3ad11debbabf863de265c571720f71ae9d3d8e06..030ab40d2727b4d808ccc5a900315202
      }
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftHumanEntity.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftHumanEntity.java
-index 293754eeb3edc04797204bf62460365769f89836..0299c282682f623eab358d97604c6b62464a7bac 100644
+index 0c98e3ec53b41659e073b0aa9cc1c17d3883c822..58d7cdd484b76cfbd7123f1f88e70eb2e51c87f9 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftHumanEntity.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftHumanEntity.java
 @@ -94,6 +94,7 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {

@@ -17158,7 +17158,7 @@ index e58fa32f0d93dd6b5243937cb380e8dbaa198e17..b3bdf11cf2b65a5d5cc40e95271daa1b
          if (playerRemovedNotChangingDimension || serverPlayerHasDisconnected) {
              player.drop(carried, false);
 diff --git a/net/minecraft/world/item/ItemStack.java b/net/minecraft/world/item/ItemStack.java
-index 54d67c847c1de9ee216cedb0527136f50223ea2d..49b001099ee49a99f9f69a91d2d13f5317093e46 100644
+index 3420f3dc79718f12d433ac7fbda04f1f30359930..0a79d1f25f07459847f2eda2f5da8eb9dfa46d60 100644
 --- a/net/minecraft/world/item/ItemStack.java
 +++ b/net/minecraft/world/item/ItemStack.java
 @@ -380,31 +380,32 @@ public final class ItemStack implements DataComponentHolder, ItemInstance {
