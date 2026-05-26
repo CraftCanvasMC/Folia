@@ -15607,7 +15607,7 @@ index 6aef14a04986c20d2f48fb42d33cc73501770ec1..a8d90b112815a004a32f3afaa419f371
          final UUIDLookup<? extends UniquelyIdentifyable> uuidLookup,
          final Class<StoredEntityType> entityClass
 diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/entity/LivingEntity.java
-index d10d082046e41cf937f1a439e3e7dd61cd16f326..cede84bbed950cc92c88b6cb951afaf3aac6442d 100644
+index 358ff4330102a058c86d8209374d8cb9dd18b6ad..2723fcc670504a25bc0402d1842ac23e9a82a518 100644
 --- a/net/minecraft/world/entity/LivingEntity.java
 +++ b/net/minecraft/world/entity/LivingEntity.java
 @@ -264,7 +264,7 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
@@ -15759,7 +15759,7 @@ index d10d082046e41cf937f1a439e3e7dd61cd16f326..cede84bbed950cc92c88b6cb951afaf3
          this.setPose(Pose.STANDING);
          this.setPos(pos.x, pos.y, pos.z);
 diff --git a/net/minecraft/world/entity/Mob.java b/net/minecraft/world/entity/Mob.java
-index 8b036640be655c65852e0862e30962e443d3024d..b5e5ce0c9d5d719d0b94d51e308e8be27f65d731 100644
+index ea144213f5ac2f813c9007113e4066a3295a7f76..97b35ede0023000f293595a2b349ec9d1c34ec5a 100644
 --- a/net/minecraft/world/entity/Mob.java
 +++ b/net/minecraft/world/entity/Mob.java
 @@ -247,8 +247,20 @@ public abstract class Mob extends LivingEntity implements Targeting, EquipmentUs
@@ -15795,7 +15795,7 @@ index 8b036640be655c65852e0862e30962e443d3024d..b5e5ce0c9d5d719d0b94d51e308e8be2
          if (target instanceof Player player && (player.isCreative() || player.isSpectator())) {
              return null;
          } else {
-@@ -1620,6 +1637,20 @@ public abstract class Mob extends LivingEntity implements Targeting, EquipmentUs
+@@ -1626,6 +1643,20 @@ public abstract class Mob extends LivingEntity implements Targeting, EquipmentUs
          }
      }
  
@@ -15816,7 +15816,7 @@ index 8b036640be655c65852e0862e30962e443d3024d..b5e5ce0c9d5d719d0b94d51e308e8be2
      @VisibleForTesting
      public void removeFreeWill() {
          this.removeAllGoals(goal -> true);
-@@ -1634,12 +1665,7 @@ public abstract class Mob extends LivingEntity implements Targeting, EquipmentUs
+@@ -1640,12 +1671,7 @@ public abstract class Mob extends LivingEntity implements Targeting, EquipmentUs
      protected void removeAfterChangingDimensions() {
          super.removeAfterChangingDimensions();
  
