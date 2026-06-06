@@ -1,12 +1,22 @@
 --- a/paper-server/build.gradle.kts
 +++ b/paper-server/build.gradle.kts
-@@ -20,8 +_,21 @@
+@@ -7,7 +_,7 @@
+     `java-library`
+     `maven-publish`
+     idea
+-    id("io.papermc.paperweight.core")
++    id("io.canvasmc.weaver.core")
+     id("io.papermc.fill.gradle") version "1.0.11"
+ }
+ 
+@@ -20,7 +_,21 @@
  
  paperweight {
      minecraftVersion = providers.gradleProperty("mcVersion")
 +    filterPatches = false
      gitFilePatches = false
- 
++    validateATs = false
++
 +    val fork = forks.register("folia") {
 +        upstream.patchDir("paperServer") {
 +            upstreamPath = "paper-server"
@@ -18,10 +28,9 @@
 +
 +    activeFork = fork
 +
-+
+ 
      updatingMinecraft {
          // oldPaperCommit = "711c5de2b05df39b72c44ff54e9f9381f8d153cb"
-     }
 @@ -86,7 +_,19 @@
      }
  }
