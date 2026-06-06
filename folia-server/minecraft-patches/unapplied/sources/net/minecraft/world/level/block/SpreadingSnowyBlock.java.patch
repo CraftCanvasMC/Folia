@@ -1,0 +1,19 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/world/level/block/SpreadingSnowyBlock.java b/net/minecraft/world/level/block/SpreadingSnowyBlock.java
+index 839bfdda7f54e6aabe401db6da1856544b032bf8..81ee6aa8a1969a8fcb0237d5df7ca57c396a37c4 100644
+--- a/net/minecraft/world/level/block/SpreadingSnowyBlock.java
++++ b/net/minecraft/world/level/block/SpreadingSnowyBlock.java
+@@ -59,7 +59,7 @@ public abstract class SpreadingSnowyBlock extends SnowyBlock {
+ 
+     @Override
+     protected void randomTick(final BlockState state, final ServerLevel level, final BlockPos pos, final RandomSource random) {
+-        if (this instanceof GrassBlock && level.paperConfig().tickRates.grassSpread != 1 && (level.paperConfig().tickRates.grassSpread < 1 || (net.minecraft.server.MinecraftServer.currentTick + pos.hashCode()) % level.paperConfig().tickRates.grassSpread != 0)) { return; } // Paper - Configurable random tick rates for blocks
++        if (this instanceof GrassBlock && level.paperConfig().tickRates.grassSpread != 1 && (level.paperConfig().tickRates.grassSpread < 1 || (io.papermc.paper.threadedregions.RegionizedServer.getCurrentTick() + pos.hashCode()) % level.paperConfig().tickRates.grassSpread != 0)) { return; } // Paper - Configurable random tick rates for blocks // Folia - regionised ticking
+         Registry<Block> blocks = level.registryAccess().lookupOrThrow(Registries.BLOCK);
+         Optional<Block> baseBlock = blocks.getOptional(this.baseBlock);
+         if (!baseBlock.isEmpty()) {

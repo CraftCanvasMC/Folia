@@ -1,0 +1,19 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/world/clock/ServerClockManager.java b/net/minecraft/world/clock/ServerClockManager.java
+index 436ed3d95c21b8590664a125785545e0d07375fd..0f914ff1ad64d85807e51344b575244a7aebed7f 100644
+--- a/net/minecraft/world/clock/ServerClockManager.java
++++ b/net/minecraft/world/clock/ServerClockManager.java
+@@ -160,7 +160,7 @@ public class ServerClockManager extends SavedData implements ClockManager {
+     }
+ 
+     private long getGameTime() {
+-        return this.level != null ? this.level.getGameTime() : this.server.overworld().getGameTime(); // Paper - per-world time
++        return this.level != null ? this.level.levelData.getGameTime() : this.server.overworld().levelData.getGameTime(); // Paper - per-world time // Folia - region threading
+     }
+ 
+     // Paper start - per-world time; per-player time

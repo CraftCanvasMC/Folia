@@ -1,0 +1,28 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/world/level/block/entity/ConduitBlockEntity.java b/net/minecraft/world/level/block/entity/ConduitBlockEntity.java
+index 6b9998ea9d44d1684d04d43fbcddc2b708b3d881..08a86f758dff860ac1cc2410e8440f179b9495cc 100644
+--- a/net/minecraft/world/level/block/entity/ConduitBlockEntity.java
++++ b/net/minecraft/world/level/block/entity/ConduitBlockEntity.java
+@@ -76,7 +76,7 @@ public class ConduitBlockEntity extends BlockEntity {
+ 
+     public static void clientTick(final Level level, final BlockPos pos, final BlockState state, final ConduitBlockEntity entity) {
+         entity.tickCount++;
+-        long gameTime = level.getGameTime();
++        long gameTime = level.getRedstoneGameTime(); // Folia - region threading
+         List<BlockPos> effectBlocks = entity.effectBlocks;
+         if (gameTime % 40L == 0L) {
+             entity.isActive = updateShape(level, pos, effectBlocks);
+@@ -92,7 +92,7 @@ public class ConduitBlockEntity extends BlockEntity {
+ 
+     public static void serverTick(final Level level, final BlockPos pos, final BlockState state, final ConduitBlockEntity entity) {
+         entity.tickCount++;
+-        long gameTime = level.getGameTime();
++        long gameTime = level.getRedstoneGameTime(); // Folia - region threading
+         List<BlockPos> effectBlocks = entity.effectBlocks;
+         if (gameTime % 40L == 0L) {
+             boolean active = updateShape(level, pos, effectBlocks);

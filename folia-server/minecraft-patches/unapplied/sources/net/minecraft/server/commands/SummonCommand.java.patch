@@ -1,0 +1,29 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/server/commands/SummonCommand.java b/net/minecraft/server/commands/SummonCommand.java
+index b99397226e41de4fc8d7624eeae5e8c71bf97575..6c165405a75574228e0632070840d8652eaed94c 100644
+--- a/net/minecraft/server/commands/SummonCommand.java
++++ b/net/minecraft/server/commands/SummonCommand.java
+@@ -96,11 +96,17 @@ public class SummonCommand {
+             throw ERROR_FAILED.create();
+         }
+ 
++        // Folia start - region threading
++        io.papermc.paper.threadedregions.RegionizedServer.getInstance().taskQueue.queueOrExecuteTickTask(
++                level, entity.chunkPosition().x(), entity.chunkPosition().z(), () -> {
++                    // Folia end - region threading
+         if (finalize && entity instanceof Mob mob) {
+             mob.finalizeSpawn(source.getLevel(), source.getLevel().getCurrentDifficultyAt(entity.blockPosition()), EntitySpawnReason.COMMAND, null);
+         }
++        level.tryAddFreshEntityWithPassengers(entity, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.COMMAND); // Folia - region threading
++        }); // Folia - region threading
+ 
+-        if (!level.tryAddFreshEntityWithPassengers(entity, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.COMMAND)) { // CraftBukkit - pass a spawn reason of "COMMAND"
++        if (false) { // CraftBukkit - pass a spawn reason of "COMMAND" // Folia - region threading
+             throw ERROR_DUPLICATE_UUID.create();
+         } else {
+             return entity;

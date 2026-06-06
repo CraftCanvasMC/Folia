@@ -1,0 +1,37 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/server/players/StoredUserList.java b/net/minecraft/server/players/StoredUserList.java
+index eaf8fb8a9cf94d0d16debf90e5ceda3f91c979ef..cf6c71db3dd39094608755998ceff6ca067238f3 100644
+--- a/net/minecraft/server/players/StoredUserList.java
++++ b/net/minecraft/server/players/StoredUserList.java
+@@ -125,6 +125,7 @@ public abstract class StoredUserList<K, V extends StoredUserEntry<K>> {
+     }
+ 
+     public void save() throws IOException {
++        synchronized (this) { // Folia - region threading
+         this.removeExpired(); // Paper - remove expired values before saving
+         JsonArray result = new JsonArray();
+         this.map.values().stream().map(entry -> Util.make(new JsonObject(), entry::serialize)).forEach(result::add);
+@@ -132,9 +133,11 @@ public abstract class StoredUserList<K, V extends StoredUserEntry<K>> {
+         try (BufferedWriter writer = Files.newWriter(this.file, StandardCharsets.UTF_8)) {
+             GSON.toJson(result, GSON.newJsonWriter(writer));
+         }
++        } // Folia - region threading
+     }
+ 
+     public void load() throws IOException {
++        synchronized (this) { // Folia - region threading
+         if (this.file.exists()) {
+             try (BufferedReader reader = Files.newReader(this.file, StandardCharsets.UTF_8)) {
+                 this.map.clear();
+@@ -159,5 +162,6 @@ public abstract class StoredUserList<K, V extends StoredUserEntry<K>> {
+             }
+             // Spigot end
+         }
++        } // Folia - region threading
+     }
+ }

@@ -1,0 +1,21 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/world/level/block/Block.java b/net/minecraft/world/level/block/Block.java
+index a8625939a4220050990b09097d5e3bfd2d8473d5..00afab1f1024363e147656a20393c38594da09b6 100644
+--- a/net/minecraft/world/level/block/Block.java
++++ b/net/minecraft/world/level/block/Block.java
+@@ -489,8 +489,8 @@ public class Block extends BlockBehaviour implements ItemLike {
+             ItemEntity entity = entityFactory.get();
+             entity.setDefaultPickUpDelay();
+             // CraftBukkit start
+-            if (level.captureDrops != null) {
+-                level.captureDrops.add(entity);
++            if (level.getCurrentWorldData().captureDrops != null) { // Folia - region threading
++                level.getCurrentWorldData().captureDrops.add(entity); // Folia - region threading
+             } else {
+                 level.addFreshEntity(entity);
+             }

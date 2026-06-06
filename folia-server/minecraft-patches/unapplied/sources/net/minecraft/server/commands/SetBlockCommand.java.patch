@@ -1,0 +1,50 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/server/commands/SetBlockCommand.java b/net/minecraft/server/commands/SetBlockCommand.java
+index 81ebcf385148d9ed57c367a99ad2f0c4079989ba..e87dc30f7455d1928714546cc4a9da8c7ec72ba3 100644
+--- a/net/minecraft/server/commands/SetBlockCommand.java
++++ b/net/minecraft/server/commands/SetBlockCommand.java
+@@ -97,6 +97,12 @@ public class SetBlockCommand {
+         );
+     }
+ 
++    // Folia start - region threading
++    private static void sendMessage(CommandSourceStack src, CommandSyntaxException ex) {
++        src.sendFailure((Component)ex.getRawMessage());
++    }
++    // Folia end - region threading
++
+     private static int setBlock(
+         final CommandSourceStack source,
+         final BlockPos pos,
+@@ -106,6 +112,11 @@ public class SetBlockCommand {
+         final boolean strict
+     ) throws CommandSyntaxException {
+         ServerLevel level = source.getLevel();
++        // Folia start - region threading
++        io.papermc.paper.threadedregions.RegionizedServer.getInstance().taskQueue.queueOrExecuteTickTask(
++                level, pos.getX() >> 4, pos.getZ() >> 4, () -> {
++                    try {
++                        // Folia end - region threading
+         if (level.isDebug()) {
+             throw ERROR_FAILED.create();
+         }
+@@ -133,7 +144,14 @@ public class SetBlockCommand {
+         }
+ 
+         source.sendSuccess(() -> Component.translatable("commands.setblock.success", pos.getX(), pos.getY(), pos.getZ()), true);
++        return; // Folia - region threading
++        // Folia start - region threading
++                    } catch (CommandSyntaxException ex) {
++                        sendMessage(source, ex);
++                    }
++                });
+         return 1;
++        // Folia end - region threading
+     }
+ 
+     public enum Mode {

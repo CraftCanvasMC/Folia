@@ -1,0 +1,39 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/world/level/LevelAccessor.java b/net/minecraft/world/level/LevelAccessor.java
+index a82be0511b6381a2e9ee32f9f5ba1cca123b0835..58dcd774b00f171a94faf7581b79675ebc43030b 100644
+--- a/net/minecraft/world/level/LevelAccessor.java
++++ b/net/minecraft/world/level/LevelAccessor.java
+@@ -26,19 +26,25 @@ import org.jspecify.annotations.Nullable;
+ public interface LevelAccessor extends CommonLevelAccessor, ScheduledTickAccess {
+     long nextSubTickCount();
+ 
++    // Folia start - region threading
++    default long getRedstoneGameTime() {
++        return this.getLevelData().getGameTime();
++    }
++    // Folia end - region threading
++
+     @Override
+     default <T> ScheduledTick<T> createTick(final BlockPos pos, final T type, final int tickDelay, final TickPriority priority) {
+-        return new ScheduledTick<>(type, pos, this.getGameTime() + tickDelay, priority, this.nextSubTickCount());
++        return new ScheduledTick<>(type, pos, this.getRedstoneGameTime() + tickDelay, priority, this.nextSubTickCount()); // Folia - region threading
+     }
+ 
+     @Override
+     default <T> ScheduledTick<T> createTick(final BlockPos pos, final T type, final int tickDelay) {
+-        return new ScheduledTick<>(type, pos, this.getGameTime() + tickDelay, this.nextSubTickCount());
++        return new ScheduledTick<>(type, pos, this.getRedstoneGameTime() + tickDelay, this.nextSubTickCount()); // Folia - region threading
+     }
+ 
+     LevelData getLevelData();
+ 
+-    default long getGameTime() {
++    default long getGameTime() { // Folia - region threading - make sure this is present
+         return this.getLevelData().getGameTime();
+     }
+ 

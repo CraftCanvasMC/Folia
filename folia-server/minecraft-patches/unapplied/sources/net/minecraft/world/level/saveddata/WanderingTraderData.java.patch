@@ -1,0 +1,18 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/world/level/saveddata/WanderingTraderData.java b/net/minecraft/world/level/saveddata/WanderingTraderData.java
+index 12e897607635707b124f8116988973887645594d..60cc79dff0d2e3b808e881e673bb8133b49a832f 100644
+--- a/net/minecraft/world/level/saveddata/WanderingTraderData.java
++++ b/net/minecraft/world/level/saveddata/WanderingTraderData.java
+@@ -18,6 +18,7 @@ public class WanderingTraderData extends SavedData {
+     );
+     private int spawnDelay;
+     private int spawnChance;
++    public int tickDelay = Integer.MIN_VALUE; // Paper - Add Wandering Trader spawn rate config options // Folia - moved from WanderingTraderSpawner
+ 
+     public WanderingTraderData() {
+         this(24000, 25);

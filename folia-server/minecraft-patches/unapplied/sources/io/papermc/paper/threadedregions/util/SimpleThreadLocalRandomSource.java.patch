@@ -1,0 +1,92 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/io/papermc/paper/threadedregions/util/SimpleThreadLocalRandomSource.java b/io/papermc/paper/threadedregions/util/SimpleThreadLocalRandomSource.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..14d20c996e9b25077f7e51c5d7d432c4a2b01671
+--- /dev/null
++++ b/io/papermc/paper/threadedregions/util/SimpleThreadLocalRandomSource.java
+@@ -0,0 +1,79 @@
++package io.papermc.paper.threadedregions.util;
++
++import net.minecraft.util.RandomSource;
++import net.minecraft.world.level.levelgen.BitRandomSource;
++import net.minecraft.world.level.levelgen.PositionalRandomFactory;
++import java.util.concurrent.ThreadLocalRandom;
++
++public final class SimpleThreadLocalRandomSource implements BitRandomSource {
++
++    public static final SimpleThreadLocalRandomSource INSTANCE = new SimpleThreadLocalRandomSource();
++
++    private final PositionalRandomFactory positionalRandomFactory = new SimpleThreadLocalRandomSource.SimpleThreadLocalRandomPositionalRandomFactory();
++
++    private SimpleThreadLocalRandomSource() {}
++
++    @Override
++    public int next(final int bits) {
++        return ThreadLocalRandom.current().nextInt() >>> (Integer.SIZE - bits);
++    }
++
++    @Override
++    public int nextInt() {
++        return ThreadLocalRandom.current().nextInt();
++    }
++
++    @Override
++    public int nextInt(final int bound) {
++        if (bound <= 0) {
++            throw new IllegalArgumentException();
++        }
++
++        // https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction/
++        final long value = (long)this.nextInt() & 0xFFFFFFFFL;
++        return (int)((value * (long)bound) >>> Integer.SIZE);
++    }
++
++    @Override
++    public void setSeed(final long seed) {
++        // no-op
++    }
++
++    @Override
++    public double nextGaussian() {
++        return ThreadLocalRandom.current().nextGaussian();
++    }
++
++    @Override
++    public RandomSource fork() {
++        return this;
++    }
++
++    @Override
++    public PositionalRandomFactory forkPositional() {
++        return this.positionalRandomFactory;
++    }
++
++    private static final class SimpleThreadLocalRandomPositionalRandomFactory implements PositionalRandomFactory {
++
++        @Override
++        public RandomSource fromHashOf(final String seed) {
++            return SimpleThreadLocalRandomSource.INSTANCE;
++        }
++
++        @Override
++        public RandomSource fromSeed(final long seed) {
++            return SimpleThreadLocalRandomSource.INSTANCE;
++        }
++
++        @Override
++        public RandomSource at(final int x, final int y, final int z) {
++            return SimpleThreadLocalRandomSource.INSTANCE;
++        }
++
++        @Override
++        public void parityConfigString(final StringBuilder info) {
++            info.append("SimpleThreadLocalRandomPositionalRandomFactory{}");
++        }
++    }
++}
+\ No newline at end of file

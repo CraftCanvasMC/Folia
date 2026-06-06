@@ -1,0 +1,61 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/world/level/block/RedstoneTorchBlock.java b/net/minecraft/world/level/block/RedstoneTorchBlock.java
+index 9d4e3511e5a3fbd9b5160c3a85a80420b2db560c..0d0b5443c5c56825e88fd64c02c993eca6044d45 100644
+--- a/net/minecraft/world/level/block/RedstoneTorchBlock.java
++++ b/net/minecraft/world/level/block/RedstoneTorchBlock.java
+@@ -74,10 +74,10 @@ public class RedstoneTorchBlock extends BaseTorchBlock {
+     protected void tick(final BlockState state, final ServerLevel level, final BlockPos pos, final RandomSource random) {
+         boolean neighborSignal = this.hasNeighborSignal(level, pos, state);
+         // Paper start - Faster redstone torch rapid clock removal
+-        java.util.ArrayDeque<RedstoneTorchBlock.Toggle> toggles = level.redstoneUpdateInfos;
++        java.util.ArrayDeque<RedstoneTorchBlock.Toggle> toggles = level.getCurrentWorldData().redstoneUpdateInfos; // Folia - region threading
+         if (toggles != null) {
+             RedstoneTorchBlock.Toggle curr;
+-            while ((curr = toggles.peek()) != null && level.getGameTime() - curr.when > 60L) {
++            while ((curr = toggles.peek()) != null && level.getRedstoneGameTime() - curr.when > 60L) { // Folia - region threading
+                 toggles.poll();
+             }
+         }
+@@ -142,13 +142,13 @@ public class RedstoneTorchBlock extends BaseTorchBlock {
+ 
+     private static boolean isToggledTooFrequently(final Level level, final BlockPos pos, final boolean add) {
+         // Paper start - Faster redstone torch rapid clock removal
+-        java.util.ArrayDeque<RedstoneTorchBlock.Toggle> toggles = level.redstoneUpdateInfos;
++        java.util.ArrayDeque<RedstoneTorchBlock.Toggle> toggles = level.getCurrentWorldData().redstoneUpdateInfos; // Folia - region threading
+         if (toggles == null) {
+-            toggles = level.redstoneUpdateInfos = new java.util.ArrayDeque<>();
++            toggles = level.getCurrentWorldData().redstoneUpdateInfos = new java.util.ArrayDeque<>(); // Folia - region threading
+         }
+         // Paper end - Faster redstone torch rapid clock removal
+         if (add) {
+-            toggles.add(new RedstoneTorchBlock.Toggle(pos.immutable(), level.getGameTime()));
++            toggles.add(new RedstoneTorchBlock.Toggle(pos.immutable(), level.getRedstoneGameTime())); // Folia - region threading
+         }
+ 
+         int count = 0;
+@@ -169,12 +169,18 @@ public class RedstoneTorchBlock extends BaseTorchBlock {
+     }
+ 
+     public static class Toggle {
+-        private final BlockPos pos;
+-        private final long when;
++        public final BlockPos pos; // Folia - region threading
++        private long when; // Folia - region threading
+ 
+         public Toggle(final BlockPos pos, final long when) {
+             this.pos = pos;
+             this.when = when;
+         }
++
++        // Folia start - region ticking
++        public void offsetTime(long offset) {
++            this.when += offset;
++        }
++        // Folia end - region ticking
+     }
+ }

@@ -1,0 +1,19 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/world/level/block/piston/PistonBaseBlock.java b/net/minecraft/world/level/block/piston/PistonBaseBlock.java
+index 869a3f9c212b739c91e1f10ac7697ce097d05655..c84e6fafe75c92507708943633f19105f44d0932 100644
+--- a/net/minecraft/world/level/block/piston/PistonBaseBlock.java
++++ b/net/minecraft/world/level/block/piston/PistonBaseBlock.java
+@@ -117,7 +117,7 @@ public class PistonBaseBlock extends DirectionalBlock {
+                 && pushedState.getValue(FACING) == direction
+                 && level.getBlockEntity(pushedPos) instanceof PistonMovingBlockEntity pistonEntity
+                 && pistonEntity.isExtending()
+-                && (pistonEntity.getProgress(0.0F) < 0.5F || level.getGameTime() == pistonEntity.getLastTicked() || ((ServerLevel)level).isHandlingTick())) {
++                && (pistonEntity.getProgress(0.0F) < 0.5F || level.getRedstoneGameTime() == pistonEntity.getLastTicked() || ((ServerLevel)level).isHandlingTick())) { // Folia - region threading
+                 event = 2;
+             }
+ 

@@ -1,0 +1,25 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/world/entity/projectile/throwableitemprojectile/ThrownEgg.java b/net/minecraft/world/entity/projectile/throwableitemprojectile/ThrownEgg.java
+index 55d97e1a69d17308196938398ab5a34bcca44e46..79c9818999759302138f195c93b3245916243014 100644
+--- a/net/minecraft/world/entity/projectile/throwableitemprojectile/ThrownEgg.java
++++ b/net/minecraft/world/entity/projectile/throwableitemprojectile/ThrownEgg.java
+@@ -102,12 +102,13 @@ public class ThrownEgg extends ThrowableItemProjectile {
+                 for (int i = 0; i < count; i++) {
+                     net.minecraft.world.entity.Entity chicken = newEntityType.create(this.level(), net.minecraft.world.entity.EntitySpawnReason.TRIGGERED); // CraftBukkit
+                     if (chicken != null) {
++                        chicken.snapTo(this.getX(), this.getY(), this.getZ(), this.getYRot(), 0.0F); // Folia - region threading - moved up
+                         // CraftBukkit start
+                         if (chicken.getBukkitEntity() instanceof org.bukkit.entity.Ageable ageable) {
+                             ageable.setBaby();
+                         }
+                         // CraftBukkit end
+-                        chicken.snapTo(this.getX(), this.getY(), this.getZ(), this.getYRot(), 0.0F);
++                        // Folia - region threading - move up
+                         // CraftBukkit start
+                         if (chicken instanceof Chicken realChicken) {
+                             Optional.ofNullable(this.getItem().get(DataComponents.CHICKEN_VARIANT)).ifPresent(realChicken::setVariant);

@@ -1,0 +1,35 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/world/entity/npc/villager/Villager.java b/net/minecraft/world/entity/npc/villager/Villager.java
+index e4ba6e200e85f4e226d6a3e68db734f277b89226..282c8e9581aa930505b30e39ee26ef6ac1eb9c9e 100644
+--- a/net/minecraft/world/entity/npc/villager/Villager.java
++++ b/net/minecraft/world/entity/npc/villager/Villager.java
+@@ -225,7 +225,7 @@ public class Villager extends AbstractVillager implements VillagerDataHolder, Re
+             brain.setSchedule(EnvironmentAttributes.VILLAGER_ACTIVITY);
+         }
+ 
+-        brain.updateActivityFromSchedule(this.level().environmentAttributes(), this.level().getGameTime(), this.position());
++        brain.updateActivityFromSchedule(this.level().environmentAttributes(), this.level().getLevelData().getGameTime(), this.position()); // Folia - region threading - not in the world yet
+     }
+ 
+     @Override
+@@ -673,6 +673,7 @@ public class Villager extends AbstractVillager implements VillagerDataHolder, Re
+             this.brain.getMemory(memoryType).ifPresent(memory -> {
+                 ServerLevel poiLevel = server.getLevel(memory.dimension());
+                 if (poiLevel != null) {
++                    io.papermc.paper.threadedregions.RegionizedServer.getInstance().taskQueue.queueOrExecuteTickTask(poiLevel, memory.pos().getX() >> 4, memory.pos().getZ() >> 4, () -> { // Folia - region threading
+                     PoiManager poiManager = poiLevel.getPoiManager();
+                     Optional<Holder<PoiType>> type = poiManager.getType(memory.pos());
+                     BiPredicate<Villager, Holder<PoiType>> poiTypePredicate = POI_MEMORIES.get(memoryType);
+@@ -680,6 +681,7 @@ public class Villager extends AbstractVillager implements VillagerDataHolder, Re
+                         poiManager.release(memory.pos());
+                         poiLevel.debugSynchronizers().updatePoi(memory.pos());
+                     }
++                    }); // Folia - region threading
+                 }
+             });
+         }

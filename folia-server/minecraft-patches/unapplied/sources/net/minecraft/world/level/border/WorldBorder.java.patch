@@ -1,0 +1,62 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/world/level/border/WorldBorder.java b/net/minecraft/world/level/border/WorldBorder.java
+index 9fee66c1a4a3db233e6af88dc6db95da246da3c5..5b9066d6d116d0df3c5fdc236dfc600c3073892e 100644
+--- a/net/minecraft/world/level/border/WorldBorder.java
++++ b/net/minecraft/world/level/border/WorldBorder.java
+@@ -37,7 +37,7 @@ public class WorldBorder extends SavedData {
+     private int absoluteMaxSize = 29999984;
+     private WorldBorder.BorderExtent extent = new WorldBorder.StaticBorderExtent(5.999997E7F);
+     public net.minecraft.server.level.@org.jspecify.annotations.Nullable ServerLevel world; // CraftBukkit
+-    private int lastTick = -1; // Paper - Prevent ticking virtual world borders multiple times per server tick
++    // Folia - region threadeing - duplicates are checked by tick loop
+ 
+     public WorldBorder() {
+         this(WorldBorder.Settings.DEFAULT);
+@@ -47,6 +47,8 @@ public class WorldBorder extends SavedData {
+         this.settings = settings;
+     }
+ 
++    // Folia - region threading - TODO make this shit thread-safe
++
+     public boolean isWithinBounds(final BlockPos pos) {
+         return this.isWithinBounds(pos.getX(), pos.getZ());
+     }
+@@ -60,16 +62,14 @@ public class WorldBorder extends SavedData {
+     }
+ 
+     // Paper start - Bound treasure maps to world border
+-    private final BlockPos.MutableBlockPos mutPos = new BlockPos.MutableBlockPos();
++    private static final ThreadLocal<BlockPos.MutableBlockPos> mutPos = ThreadLocal.withInitial(() -> new BlockPos.MutableBlockPos()); // Folia - region threading
+ 
+     public boolean isBlockInBounds(int x, int z) {
+-        this.mutPos.set(x, 64, z);
+-        return this.isWithinBounds(this.mutPos);
++        return this.isWithinBounds(mutPos.get().set(x, 64, z)); // Folia - region threading
+     }
+ 
+     public boolean isChunkInBounds(int chunkX, int chunkZ) {
+-        this.mutPos.set(((chunkX << 4) + 15), 64, (chunkZ << 4) + 15);
+-        return this.isWithinBounds(this.mutPos);
++        return this.isWithinBounds(mutPos.get().set(((chunkX << 4) + 15), 64, (chunkZ << 4) + 15)); // Folia - region threading
+     }
+     // Paper end - Bound treasure maps to world border
+ 
+@@ -329,12 +329,7 @@ public class WorldBorder extends SavedData {
+     }
+ 
+     public void tick() {
+-        // Paper start - Prevent ticking virtual world borders multiple times per server tick
+-        if (this.lastTick == net.minecraft.server.MinecraftServer.currentTick) {
+-            return;
+-        }
+-        this.lastTick = net.minecraft.server.MinecraftServer.currentTick;
+-        // Paper end - Prevent ticking virtual world borders multiple times per server tick
++        // Folia - region threadeing - duplicates are checked by tick loop
+         this.extent = this.extent.update();
+     }
+ 

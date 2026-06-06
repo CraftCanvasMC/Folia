@@ -1,0 +1,46 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/world/entity/TamableAnimal.java b/net/minecraft/world/entity/TamableAnimal.java
+index 23a183f6ded4ed52f5a80200c8ac4e8b5c396bb5..afeb4733e62e40b23070a0fae95fcb456e1939e4 100644
+--- a/net/minecraft/world/entity/TamableAnimal.java
++++ b/net/minecraft/world/entity/TamableAnimal.java
+@@ -253,6 +253,11 @@ public abstract class TamableAnimal extends Animal implements OwnableEntity {
+     public void tryToTeleportToOwner() {
+         LivingEntity owner = this.getOwner();
+         if (owner != null) {
++            // Folia start - region threading
++            if (owner.isRemoved() || owner.level() != this.level()) {
++                return;
++            }
++            // Folia end - region threading
+             this.teleportToAroundBlockPos(owner.blockPosition());
+         }
+     }
+@@ -286,7 +291,22 @@ public abstract class TamableAnimal extends Animal implements OwnableEntity {
+             return false;
+         }
+         org.bukkit.Location to = event.getTo();
+-        this.snapTo(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch());
++        // Folia start - region threading - can't teleport here, we may be removed by teleport logic - delay until next tick
++        // also, use teleportAsync so that crossing region boundaries will not blow up
++        org.bukkit.Location finalTo = to;
++        Level sourceWorld = this.level();
++        this.getBukkitEntity().taskScheduler.schedule((TamableAnimal nmsEntity) -> {
++            if (nmsEntity.level() == sourceWorld) {
++                nmsEntity.teleportAsync(
++                        (net.minecraft.server.level.ServerLevel)nmsEntity.level(),
++                        new net.minecraft.world.phys.Vec3(finalTo.getX(), finalTo.getY(), finalTo.getZ()),
++                        Float.valueOf(finalTo.getYaw()), Float.valueOf(finalTo.getPitch()),
++                        net.minecraft.world.phys.Vec3.ZERO, org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.UNKNOWN, Entity.TELEPORT_FLAG_LOAD_CHUNK,
++                        null
++                );
++            }
++        }, null, 1L);
++        // Folia end - region threading - can't teleport here, we may be removed by teleport logic - delay until next tick
+         // CraftBukkit end
+         this.navigation.stop();
+         return true;

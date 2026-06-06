@@ -1,0 +1,21 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/world/level/block/Portal.java b/net/minecraft/world/level/block/Portal.java
+index 3098fa04fe7a282ac008d9c902c8525892e83d31..e6e8a8815f34f077200eea4dc755677c8571dc80 100644
+--- a/net/minecraft/world/level/block/Portal.java
++++ b/net/minecraft/world/level/block/Portal.java
+@@ -13,6 +13,10 @@ public interface Portal {
+ 
+     @Nullable TeleportTransition getPortalDestination(final ServerLevel currentLevel, final Entity entity, final BlockPos portalEntryPos);
+ 
++    // Folia start - region threading
++    public boolean portalAsync(ServerLevel sourceWorld, Entity portalTarget, BlockPos portalPos);
++    // Folia end - region threading
++
+     default Portal.Transition getLocalTransition() {
+         return Portal.Transition.NONE;
+     }

@@ -1,0 +1,22 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/world/entity/ai/navigation/GroundPathNavigation.java b/net/minecraft/world/entity/ai/navigation/GroundPathNavigation.java
+index 2d0531aed8a3274d8673b0950eb284101d933755..ec9646ff88d5546a00e6d96de55847d76298f857 100644
+--- a/net/minecraft/world/entity/ai/navigation/GroundPathNavigation.java
++++ b/net/minecraft/world/entity/ai/navigation/GroundPathNavigation.java
+@@ -43,6 +43,11 @@ public class GroundPathNavigation extends PathNavigation {
+ 
+     @Override
+     public Path createPath(BlockPos pos, @org.jspecify.annotations.Nullable Entity entity, final int reachRange) { // Paper - EntityPathfindEvent
++        // Folia start - region threading
++        if (!ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor((net.minecraft.server.level.ServerLevel)this.level, pos)) {
++            return null;
++        }
++        // Folia end - region threading
+         LevelChunk chunk = this.level.getChunkSource().getChunkNow(SectionPos.blockToSectionCoord(pos.getX()), SectionPos.blockToSectionCoord(pos.getZ()));
+         if (chunk == null) {
+             return null;

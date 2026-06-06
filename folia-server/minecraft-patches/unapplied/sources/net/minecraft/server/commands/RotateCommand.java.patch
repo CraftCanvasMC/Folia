@@ -1,0 +1,35 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/server/commands/RotateCommand.java b/net/minecraft/server/commands/RotateCommand.java
+index a28adb392ced800e9e0b5848b5a297a571053123..0b25614f5513f366e091c59f6f8ba585c92a2a03 100644
+--- a/net/minecraft/server/commands/RotateCommand.java
++++ b/net/minecraft/server/commands/RotateCommand.java
+@@ -66,18 +66,22 @@ public class RotateCommand {
+         );
+     }
+ 
+-    private static int rotate(final CommandSourceStack source, final Entity entity, final Coordinates rotation) {
++    private static int rotate(final CommandSourceStack source, final Entity entityOld, final Coordinates rotation) { // Folia - region threading
+         Vec2 rot = rotation.getRotation(source);
++        entityOld.getBukkitEntity().taskScheduler.scheduleOrExecute((Entity entity) -> { // Folia - region threading
+         float relativeOrAbsoluteYRot = rotation.isYRelative() ? rot.y - entity.getYRot() : rot.y;
+         float relativeOrAbsoluteXRot = rotation.isXRelative() ? rot.x - entity.getXRot() : rot.x;
+         entity.forceSetRotation(relativeOrAbsoluteYRot, rotation.isYRelative(), relativeOrAbsoluteXRot, rotation.isXRelative());
+         source.sendSuccess(() -> Component.translatable("commands.rotate.success", entity.getDisplayName()), true);
++        }); // Folia - region threading
+         return 1;
+     }
+ 
+-    private static int rotate(final CommandSourceStack source, final Entity entity, final LookAt facing) {
++    private static int rotate(final CommandSourceStack source, final Entity entityOld, final LookAt facing) {
++        entityOld.getBukkitEntity().taskScheduler.scheduleOrExecute((Entity entity) -> { // Folia - region threading
+         facing.perform(source, entity);
+         source.sendSuccess(() -> Component.translatable("commands.rotate.success", entity.getDisplayName()), true);
++        }); // Folia - region threading
+         return 1;
+     }
+ }

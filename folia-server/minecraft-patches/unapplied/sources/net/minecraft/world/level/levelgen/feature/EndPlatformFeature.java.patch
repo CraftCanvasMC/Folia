@@ -1,0 +1,19 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/world/level/levelgen/feature/EndPlatformFeature.java b/net/minecraft/world/level/levelgen/feature/EndPlatformFeature.java
+index 68eb73d004dfe85bccc96af269832b0086d01720..b67f5f7b76037ab77548c37a83e4d0918915223a 100644
+--- a/net/minecraft/world/level/levelgen/feature/EndPlatformFeature.java
++++ b/net/minecraft/world/level/levelgen/feature/EndPlatformFeature.java
+@@ -46,7 +46,7 @@ public class EndPlatformFeature extends Feature<NoneFeatureConfiguration> {
+ 
+         // CraftBukkit start
+         // SPIGOT-7746: Entity will only be null during world generation, which is async, so just generate without event
+-        if (entity != null) {
++        if (false) { // Folia - region threading
+             org.bukkit.World bworld = newLevel.getLevel().getWorld();
+             org.bukkit.event.world.PortalCreateEvent portalEvent = new org.bukkit.event.world.PortalCreateEvent((java.util.List<org.bukkit.block.BlockState>) (java.util.List) blockList.getSnapshotBlocks(), bworld, entity.getBukkitEntity(), org.bukkit.event.world.PortalCreateEvent.CreateReason.END_PLATFORM);
+             newLevel.getLevel().getCraftServer().getPluginManager().callEvent(portalEvent);

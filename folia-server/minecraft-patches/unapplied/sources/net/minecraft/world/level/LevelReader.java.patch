@@ -1,0 +1,36 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/world/level/LevelReader.java b/net/minecraft/world/level/LevelReader.java
+index 416646f15ceea04fbbb5a5b0044c2a4927a39ba2..4e6a32b6fb65c0b8bc1f90e3120731b4f25acdda 100644
+--- a/net/minecraft/world/level/LevelReader.java
++++ b/net/minecraft/world/level/LevelReader.java
+@@ -207,6 +207,25 @@ public interface LevelReader extends BlockAndLightGetter, CollisionGetter, Signa
+         return y1 >= this.getMinY() && y0 <= this.getMaxY() && this.hasChunksAt(x0, z0, x1, z1);
+     }
+ 
++    // Folia start - region threading
++    default boolean hasAndOwnsChunksAt(int minX, int minZ, int maxX, int maxZ) {
++        int i = SectionPos.blockToSectionCoord(minX);
++        int j = SectionPos.blockToSectionCoord(maxX);
++        int k = SectionPos.blockToSectionCoord(minZ);
++        int l = SectionPos.blockToSectionCoord(maxZ);
++
++        for(int m = i; m <= j; ++m) {
++            for(int n = k; n <= l; ++n) {
++                if (!this.hasChunk(m, n) || (this instanceof net.minecraft.server.level.ServerLevel world && !ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(world, m, n))) {
++                    return false;
++                }
++            }
++        }
++
++        return true;
++    }
++    // Folia end - region threading
++
+     @Deprecated
+     default boolean hasChunksAt(final int x0, final int z0, final int x1, final int z1) {
+         int chunkX0 = SectionPos.blockToSectionCoord(x0);

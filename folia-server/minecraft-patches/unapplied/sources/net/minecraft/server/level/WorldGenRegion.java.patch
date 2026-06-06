@@ -1,0 +1,32 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/server/level/WorldGenRegion.java b/net/minecraft/server/level/WorldGenRegion.java
+index 692f8684b9bccd76ab03edbc2ef31149d8a67cc8..d4298b20dcc96fcdb80d8afa0141939c2d92bb40 100644
+--- a/net/minecraft/server/level/WorldGenRegion.java
++++ b/net/minecraft/server/level/WorldGenRegion.java
+@@ -105,6 +105,13 @@ public class WorldGenRegion implements WorldGenLevel {
+         return this.getLightEngine().getRawBrightness(blockPos, subtract);
+     }
+     // Paper end - rewrite chunk system
++    // Folia start - region threading
++    private final net.minecraft.world.level.StructureManager structureManager;
++    @Override
++    public net.minecraft.world.level.StructureManager structureManager() {
++        return this.structureManager;
++    }
++    // Folia end - region threading
+ 
+     public WorldGenRegion(final ServerLevel level, final StaticCache2D<GenerationChunkHolder> cache, final ChunkStep generatingStep, final ChunkAccess center) {
+         this.generatingStep = generatingStep;
+@@ -116,6 +123,7 @@ public class WorldGenRegion implements WorldGenLevel {
+         this.random = level.getChunkSource().randomState().getOrCreateRandomFactory(WORLDGEN_REGION_RANDOM).at(this.center.getPos().getWorldPosition());
+         this.dimensionType = level.dimensionType();
+         this.biomeManager = new BiomeManager(this, BiomeManager.obfuscateSeed(this.seed));
++        this.structureManager = level.structureManager().forWorldGenRegion(this); // Folia - region threading
+     }
+ 
+     public boolean isOldChunkAround(final ChunkPos pos, final int range) {

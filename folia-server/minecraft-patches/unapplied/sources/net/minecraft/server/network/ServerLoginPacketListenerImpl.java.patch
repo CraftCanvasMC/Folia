@@ -1,0 +1,51 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/server/network/ServerLoginPacketListenerImpl.java b/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
+index 722c832ce18fd930d9fdb4f718dc13bfc962e5dd..c149ed81a99e5aa814209abb1c2a6e4efe5f7f12 100644
+--- a/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
++++ b/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
+@@ -92,7 +92,13 @@ public class ServerLoginPacketListenerImpl implements ServerLoginPacketListener,
+         // Paper end - login cookie API
+ 
+         if (this.state == ServerLoginPacketListenerImpl.State.VERIFYING) {
++            // Folia start - region threading - rewrite login process
++            String name = this.authenticatedProfile.name();
++            java.util.UUID uniqueId = this.authenticatedProfile.id();
++            if (this.server.getPlayerList().pushPendingJoin(name, uniqueId, this.connection)) {
++            // Folia end - region threading - rewrite login process
+             this.verifyLoginAndFinishConnectionSetup(Objects.requireNonNull(this.authenticatedProfile));
++            } // Folia - region threading - rewrite login process
+         }
+ 
+         if (this.state == ServerLoginPacketListenerImpl.State.WAITING_FOR_DUPE_DISCONNECT
+@@ -212,7 +218,7 @@ public class ServerLoginPacketListenerImpl implements ServerLoginPacketListener,
+ 
+     private void verifyLoginAndFinishConnectionSetup(final GameProfile profile) {
+         PlayerList playerList = this.server.getPlayerList();
+-        Component error = org.bukkit.craftbukkit.event.CraftEventFactory.handleLoginResult(playerList.canPlayerLogin(this.connection.getRemoteAddress(), new NameAndId(profile)), this.paperLoginConnection, this.connection, profile, this.server, true); // Paper
++        Component error = org.bukkit.craftbukkit.event.CraftEventFactory.handleLoginResult(playerList.canPlayerLogin(this.connection.getRemoteAddress(), new NameAndId(profile), this.connection), this.paperLoginConnection, this.connection, profile, this.server, true); // Paper // Folia - region threading - add connection parameter
+         if (error != null) {
+             this.disconnectAsync(error); // Paper
+         } else {
+@@ -224,7 +230,7 @@ public class ServerLoginPacketListenerImpl implements ServerLoginPacketListener,
+                     );
+             }
+ 
+-            boolean waitForDisconnection = playerList.disconnectAllPlayersWithProfile(profile); // Paper - validate usernames
++            boolean waitForDisconnection = false &&playerList.disconnectAllPlayersWithProfile(profile); // Paper - validate usernames // Folia - rewrite login process - always false here
+             if (waitForDisconnection) {
+                 this.state = ServerLoginPacketListenerImpl.State.WAITING_FOR_DUPE_DISCONNECT;
+             } else {
+@@ -338,7 +344,7 @@ public class ServerLoginPacketListenerImpl implements ServerLoginPacketListener,
+         uniqueId = gameprofile.id();
+         // Paper end - Add more fields to AsyncPlayerPreLoginEvent
+ 
+-        if (PlayerPreLoginEvent.getHandlerList().getRegisteredListeners().length != 0) {
++        if (false && PlayerPreLoginEvent.getHandlerList().getRegisteredListeners().length != 0) { // Folia - region threading
+             final PlayerPreLoginEvent event = new PlayerPreLoginEvent(playerName, address, uniqueId);
+             if (asyncEvent.getResult() != PlayerPreLoginEvent.Result.ALLOWED) {
+                 event.disallow(asyncEvent.getResult(), asyncEvent.kickMessage()); // Paper - Adventure

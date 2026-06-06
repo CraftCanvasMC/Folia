@@ -1,0 +1,19 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/world/level/chunk/ChunkGenerator.java b/net/minecraft/world/level/chunk/ChunkGenerator.java
+index aed69011d7e1a7819276d4bcd14ec47d367cbeb1..f755847512fee625ee4bfc9c31e6b48c8c3cdcb4 100644
+--- a/net/minecraft/world/level/chunk/ChunkGenerator.java
++++ b/net/minecraft/world/level/chunk/ChunkGenerator.java
+@@ -326,7 +326,7 @@ public abstract class ChunkGenerator {
+     }
+ 
+     private static boolean tryAddReference(final StructureManager manager, final StructureStart start) {
+-        if (start.canBeReferenced()) {
++        if (start.tryReference()) { // Folia - region threading
+             manager.addReference(start);
+             return true;
+         } else {

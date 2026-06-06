@@ -1,0 +1,116 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/world/level/chunk/LevelChunk.java b/net/minecraft/world/level/chunk/LevelChunk.java
+index a9d781e2fcac4e2426b0e35e46bbc10c540f9fd9..29fff1aa1c6181f4e562e342254692f7b0b2984f 100644
+--- a/net/minecraft/world/level/chunk/LevelChunk.java
++++ b/net/minecraft/world/level/chunk/LevelChunk.java
+@@ -70,6 +70,13 @@ public class LevelChunk extends ChunkAccess implements DebugValueSource, ca.spot
+         public void tick() {
+         }
+ 
++        // Folia start - region threading
++        @Override
++        public BlockEntity getTileEntity() {
++            return null;
++        }
++        // Folia end - region threading
++
+         @Override
+         public boolean isRemoved() {
+             return true;
+@@ -239,11 +246,7 @@ public class LevelChunk extends ChunkAccess implements DebugValueSource, ca.spot
+ 
+     @Override
+     public void markUnsaved() {
+-        boolean wasUnsaved = this.isUnsaved();
+-        super.markUnsaved();
+-        if (!wasUnsaved) {
+-            this.unsavedListener.setUnsaved(this.chunkPos);
+-        }
++        super.markUnsaved(); // Folia - region threading - unsavedListener is not really use
+     }
+ 
+     @Override
+@@ -365,6 +368,7 @@ public class LevelChunk extends ChunkAccess implements DebugValueSource, ca.spot
+ 
+     @Override
+     public @Nullable BlockState setBlockState(final BlockPos pos, final BlockState state, @Block.UpdateFlags final int flags) {
++        ca.spottedleaf.moonrise.common.util.TickThread.ensureTickThread(this.level, pos, "Updating block asynchronously"); // Folia - region threading
+         int y = pos.getY();
+         LevelChunkSection section = this.getSection(this.getSectionIndex(y));
+         boolean wasEmpty = section.hasOnlyAir();
+@@ -424,7 +428,7 @@ public class LevelChunk extends ChunkAccess implements DebugValueSource, ca.spot
+             return null;
+         }
+ 
+-        if (!this.level.isClientSide() && (flags & Block.UPDATE_SKIP_ON_PLACE) == 0 && (!this.level.captureBlockStates || newBlock instanceof net.minecraft.world.level.block.BaseEntityBlock)) { // CraftBukkit - Don't place while processing the BlockPlaceEvent, unless it's a BlockContainer. Prevents blocks such as TNT from activating when cancelled.
++        if (!this.level.isClientSide() && (flags & Block.UPDATE_SKIP_ON_PLACE) == 0 && (!this.level.getCurrentWorldData().captureBlockStates || newBlock instanceof net.minecraft.world.level.block.BaseEntityBlock)) { // CraftBukkit - Don't place while processing the BlockPlaceEvent, unless it's a BlockContainer. Prevents blocks such as TNT from activating when cancelled. // Folia - region threading
+             state.onPlace(this.level, pos, oldState, movedByPiston);
+         }
+ 
+@@ -468,7 +472,7 @@ public class LevelChunk extends ChunkAccess implements DebugValueSource, ca.spot
+ 
+     public @Nullable BlockEntity getBlockEntity(final BlockPos pos, final LevelChunk.EntityCreationType creationType) {
+         // CraftBukkit start
+-        BlockEntity blockEntity = this.level.capturedTileEntities.get(pos);
++        BlockEntity blockEntity = this.level.getCurrentWorldData().capturedTileEntities.get(pos); // Folia - region threading
+         if (blockEntity == null) {
+             blockEntity = this.blockEntities.get(pos);
+         }
+@@ -656,13 +660,13 @@ public class LevelChunk extends ChunkAccess implements DebugValueSource, ca.spot
+ 
+                 org.bukkit.World world = this.level.getWorld();
+                 if (world != null) {
+-                    this.level.populating = true;
++                    this.level.getCurrentWorldData().populating = true; // Folia - region threading
+                     try {
+                         for (org.bukkit.generator.BlockPopulator populator : world.getPopulators()) {
+                             populator.populate(world, random, bukkitChunk);
+                         }
+                     } finally {
+-                        this.level.populating = false;
++                        this.level.getCurrentWorldData().populating = false; // Folia - region threading
+                     }
+                 }
+                 server.getPluginManager().callEvent(new org.bukkit.event.world.ChunkPopulateEvent(bukkitChunk));
+@@ -688,7 +692,7 @@ public class LevelChunk extends ChunkAccess implements DebugValueSource, ca.spot
+     @Override
+     public boolean isUnsaved() {
+         // Paper start - rewrite chunk system
+-        final long gameTime = this.level.getGameTime();
++        final long gameTime = this.level.getRedstoneGameTime(); // Folia - region threading
+         if (((ca.spottedleaf.moonrise.patches.chunk_system.ticks.ChunkSystemLevelChunkTicks)this.blockTicks).moonrise$isDirty(gameTime)
+             || ((ca.spottedleaf.moonrise.patches.chunk_system.ticks.ChunkSystemLevelChunkTicks)this.fluidTicks).moonrise$isDirty(gameTime)) {
+             return true;
+@@ -940,6 +944,13 @@ public class LevelChunk extends ChunkAccess implements DebugValueSource, ca.spot
+             this.ticker = ticker;
+         }
+ 
++        // Folia start - region threading
++        @Override
++        public BlockEntity getTileEntity() {
++            return this.blockEntity;
++        }
++        // Folia end - region threading
++
+         @Override
+         public void tick() {
+             if (!this.blockEntity.isRemoved() && this.blockEntity.hasLevel()) {
+@@ -1024,6 +1035,13 @@ public class LevelChunk extends ChunkAccess implements DebugValueSource, ca.spot
+             this.ticker = ticker;
+         }
+ 
++        // Folia start - region threading
++        @Override
++        public BlockEntity getTileEntity() {
++            return this.ticker == null ? null : this.ticker.getTileEntity();
++        }
++        // Folia end - region threading
++
+         @Override
+         public void tick() {
+             this.ticker.tick();

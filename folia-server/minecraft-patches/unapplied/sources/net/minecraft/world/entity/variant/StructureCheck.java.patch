@@ -1,0 +1,19 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/world/entity/variant/StructureCheck.java b/net/minecraft/world/entity/variant/StructureCheck.java
+index cb82c5404d222b4053207bfc55aa32298c6d383d..ffb92d3d72eee9d469341dcaacec67c55c036dff 100644
+--- a/net/minecraft/world/entity/variant/StructureCheck.java
++++ b/net/minecraft/world/entity/variant/StructureCheck.java
+@@ -15,7 +15,7 @@ public record StructureCheck(HolderSet<Structure> requiredStructures) implements
+ 
+     @Override
+     public boolean test(final SpawnContext context) {
+-        return context.level().getLevel().structureManager().getStructureWithPieceAt(context.pos(), this.requiredStructures, context.level()).isValid(); // Paper - Fix swamp hut cat generation deadlock
++        return context.level().getLevel().structureManager().getStructureWithPieceAt(context.pos(), this.requiredStructures).isValid(); // Paper - Fix swamp hut cat generation deadlock // Folia - region threading - properly fix this
+     }
+ 
+     @Override

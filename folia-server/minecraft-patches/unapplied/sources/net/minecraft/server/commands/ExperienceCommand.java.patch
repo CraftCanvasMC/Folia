@@ -1,0 +1,55 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/server/commands/ExperienceCommand.java b/net/minecraft/server/commands/ExperienceCommand.java
+index 0f35ed2c4029b3aaa0e72c1cb0ecd204147f203f..8eae0c33e3f37c388f3c7466e5733fb5da90258a 100644
+--- a/net/minecraft/server/commands/ExperienceCommand.java
++++ b/net/minecraft/server/commands/ExperienceCommand.java
+@@ -123,16 +123,23 @@ public class ExperienceCommand {
+     }
+ 
+     private static int queryExperience(final CommandSourceStack source, final ServerPlayer target, final ExperienceCommand.Type type) {
+-        int result = type.query.applyAsInt(target);
+-        source.sendSuccess(() -> Component.translatable("commands.experience.query." + type.name, target.getDisplayName(), result), false);
+-        return result;
++        // Folia start - region threading
++        target.getBukkitEntity().taskScheduler.scheduleOrExecute((ServerPlayer newTarget) -> {
++            int result = type.query.applyAsInt(newTarget);
++            source.sendSuccess(() -> Component.translatable("commands.experience.query." + type.name, newTarget.getDisplayName(), result), false);
++            return;
++        });
++        return 0;
++        // Folia end - region threading
+     }
+ 
+     private static int addExperience(
+         final CommandSourceStack source, final Collection<? extends ServerPlayer> players, final int amount, final ExperienceCommand.Type type
+     ) {
+         for (ServerPlayer player : players) {
+-            type.add.accept(player, amount);
++            player.getBukkitEntity().taskScheduler.schedule((ServerPlayer newPlayer) -> { // Folia - region threading
++            type.add.accept(newPlayer, amount); // Folia - region threading
++            }, null, 1L); // Folia - region threading
+         }
+ 
+         if (players.size() == 1) {
+@@ -153,9 +160,14 @@ public class ExperienceCommand {
+         int success = 0;
+ 
+         for (ServerPlayer player : players) {
+-            if (type.set.test(player, amount)) {
+-                success++;
++            // Folia start - region threading
++            ++success;
++            player.getBukkitEntity().taskScheduler.schedule((ServerPlayer newPlayer) -> {
++            if (type.set.test(newPlayer, amount)) {
++                //success++;
++                // Folia end - region threading
+             }
++            }, null, 1L); // Folia - region threading
+         }
+ 
+         if (success == 0) {

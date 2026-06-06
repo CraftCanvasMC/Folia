@@ -1,0 +1,52 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/server/commands/EffectCommands.java b/net/minecraft/server/commands/EffectCommands.java
+index 451566713b3792d9af41a571aaf7b02422d616d3..eaf03170345c9c71808f051856e89463b93c3fdd 100644
+--- a/net/minecraft/server/commands/EffectCommands.java
++++ b/net/minecraft/server/commands/EffectCommands.java
+@@ -178,7 +178,12 @@ public class EffectCommands {
+         for (Entity entity : entities) {
+             if (entity instanceof LivingEntity) {
+                 MobEffectInstance instance = new MobEffectInstance(effectHolder, duration, amplifier, false, particles);
+-                if (((LivingEntity)entity).addEffect(instance, source.getEntity(), org.bukkit.event.entity.EntityPotionEffectEvent.Cause.COMMAND)) { // CraftBukkit
++                // Folia start - region threading
++                entity.getBukkitEntity().taskScheduler.scheduleOrExecute((LivingEntity newEntity) -> {
++                    ((LivingEntity)newEntity).addEffect(instance, source.getEntity(), org.bukkit.event.entity.EntityPotionEffectEvent.Cause.COMMAND);
++                });
++                // Folia end - region threading
++                if (true) { // CraftBukkit // CraftBukkit // Folia - region threading
+                     count++;
+                 }
+             }
+@@ -208,7 +213,12 @@ public class EffectCommands {
+         int count = 0;
+ 
+         for (Entity entity : entities) {
+-            if (entity instanceof LivingEntity && ((LivingEntity)entity).removeAllEffects(org.bukkit.event.entity.EntityPotionEffectEvent.Cause.COMMAND)) { // CraftBukkit
++            if (entity instanceof LivingEntity && true) { // CraftBukkit // Folia - region threading
++                // Folia start - region threading
++                entity.getBukkitEntity().taskScheduler.scheduleOrExecute((LivingEntity newEntity) -> {
++                    ((LivingEntity)newEntity).removeAllEffects(org.bukkit.event.entity.EntityPotionEffectEvent.Cause.COMMAND);
++                });
++                // Folia end - region threading
+                 count++;
+             }
+         }
+@@ -233,7 +243,12 @@ public class EffectCommands {
+         int count = 0;
+ 
+         for (Entity entity : entities) {
+-            if (entity instanceof LivingEntity && ((LivingEntity)entity).removeEffect(effectHolder, org.bukkit.event.entity.EntityPotionEffectEvent.Cause.COMMAND)) { // CraftBukkit
++            if (entity instanceof LivingEntity && true) { // CraftBukkit // Folia - region threading
++                // Folia start - region threading
++                entity.getBukkitEntity().taskScheduler.scheduleOrExecute((LivingEntity newEntity) -> {
++                    ((LivingEntity)newEntity).removeEffect(effectHolder, org.bukkit.event.entity.EntityPotionEffectEvent.Cause.COMMAND);
++                });
++                // Folia end - region threading
+                 count++;
+             }
+         }

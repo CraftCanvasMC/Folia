@@ -1,0 +1,58 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/server/players/BanListEntry.java b/net/minecraft/server/players/BanListEntry.java
+index 09df99f2272b3330448009d4729db83d88d22c0b..79884f5c3e4539e1046e30f59d9e71dca7888c50 100644
+--- a/net/minecraft/server/players/BanListEntry.java
++++ b/net/minecraft/server/players/BanListEntry.java
+@@ -10,7 +10,7 @@ import net.minecraft.network.chat.Component;
+ import org.jspecify.annotations.Nullable;
+ 
+ public abstract class BanListEntry<T> extends StoredUserEntry<T> {
+-    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z", Locale.ROOT);
++    public static final ThreadLocal<SimpleDateFormat> DATE_FORMAT = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z", Locale.ROOT)); // Folia - region threading - SDF is not thread-safe
+     public static final String EXPIRES_NEVER = "forever";
+     protected final Date created;
+     protected final String source;
+@@ -32,7 +32,7 @@ public abstract class BanListEntry<T> extends StoredUserEntry<T> {
+ 
+         Date created;
+         try {
+-            created = object.has("created") ? DATE_FORMAT.parse(object.get("created").getAsString()) : new Date();
++            created = object.has("created") ? DATE_FORMAT.get().parse(object.get("created").getAsString()) : new Date(); // Folia - region threading - SDF is not thread-safe
+         } catch (ParseException ignored) {
+             created = new Date();
+         }
+@@ -42,7 +42,7 @@ public abstract class BanListEntry<T> extends StoredUserEntry<T> {
+ 
+         Date expires;
+         try {
+-            expires = object.has("expires") ? DATE_FORMAT.parse(object.get("expires").getAsString()) : null;
++            expires = object.has("expires") ? DATE_FORMAT.get().parse(object.get("expires").getAsString()) : null; // Folia - region threading - SDF is not thread-safe
+         } catch (ParseException ignored) {
+             expires = null;
+         }
+@@ -81,9 +81,9 @@ public abstract class BanListEntry<T> extends StoredUserEntry<T> {
+ 
+     @Override
+     protected void serialize(final JsonObject object) {
+-        object.addProperty("created", DATE_FORMAT.format(this.created));
++        object.addProperty("created", DATE_FORMAT.get().format(this.created)); // Folia - region threading - SDF is not thread-safe
+         object.addProperty("source", this.source);
+-        object.addProperty("expires", this.expires == null ? "forever" : DATE_FORMAT.format(this.expires));
++        object.addProperty("expires", this.expires == null ? "forever" : DATE_FORMAT.get().format(this.expires)); // Folia - region threading - SDF is not thread-safe
+         object.addProperty("reason", this.reason);
+     }
+ 
+@@ -107,7 +107,7 @@ public abstract class BanListEntry<T> extends StoredUserEntry<T> {
+         Date expires = null;
+ 
+         try {
+-            expires = jsonobject.has("expires") ? BanListEntry.DATE_FORMAT.parse(jsonobject.get("expires").getAsString()) : null;
++            expires = jsonobject.has("expires") ? BanListEntry.DATE_FORMAT.get().parse(jsonobject.get("expires").getAsString()) : null; // Folia - region threading - SDF is not thread-safe
+         } catch (ParseException ex) {
+             // Guess we don't have a date
+         }

@@ -1,0 +1,70 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/world/level/block/NetherPortalBlock.java b/net/minecraft/world/level/block/NetherPortalBlock.java
+index 14cca8dae351481328c689d4227d36c00f279b42..c1e9104bb9ffdc3238f7170971d68b487ed9fa30 100644
+--- a/net/minecraft/world/level/block/NetherPortalBlock.java
++++ b/net/minecraft/world/level/block/NetherPortalBlock.java
+@@ -179,6 +179,33 @@ public class NetherPortalBlock extends Block implements Portal {
+         // CraftBukkit end
+     }
+ 
++    // Folia start - region threading
++    @Override
++    public boolean portalAsync(ServerLevel sourceWorld, Entity portalTarget, BlockPos portalPos) {
++        if (!ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(portalTarget)) {
++            return false;
++        }
++        if (!ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(sourceWorld, portalPos)) {
++            return false;
++        }
++
++        return portalTarget.netherPortalLogicAsync(portalPos);
++    }
++
++    public static BlockUtil.FoundRectangle findPortalAround(ServerLevel world, BlockPos rough, WorldBorder worldBorder, int searchRadius) {
++        BlockPos found = world.getPortalForcer().findClosestPortalPosition(rough, worldBorder, searchRadius).orElse(null);
++        if (found == null) {
++            return null;
++        }
++
++        BlockState portalState = world.getBlockStateFromEmptyChunk(found);
++
++        return BlockUtil.getLargestRectangleAround(found, portalState.getValue(BlockStateProperties.HORIZONTAL_AXIS), 21, Direction.Axis.Y, 21, (pos) -> {
++            return world.getBlockStateFromEmptyChunk(pos) == portalState;
++        });
++    }
++    // Folia end - region threading
++
+     private @Nullable TeleportTransition getExitPortal(
+         final ServerLevel newLevel,
+         final Entity entity,
+@@ -193,14 +220,14 @@ public class NetherPortalBlock extends Block implements Portal {
+         TeleportTransition.PostTeleportTransition post;
+         if (exitPortalPos.isPresent()) {
+             BlockPos pos = exitPortalPos.get();
+-            BlockState portalState = newLevel.getBlockState(pos);
++            BlockState portalState = newLevel.getBlockStateFromEmptyChunk(pos); // Folia - region threading
+             exitPortal = BlockUtil.getLargestRectangleAround(
+                 pos,
+                 portalState.getValue(BlockStateProperties.HORIZONTAL_AXIS),
+                 21,
+                 Direction.Axis.Y,
+                 21,
+-                blockPos -> newLevel.getBlockState(blockPos) == portalState
++                blockPos -> newLevel.getBlockStateFromEmptyChunk(blockPos) == portalState // Folia - region threading
+             );
+             post = TeleportTransition.PLAY_PORTAL_SOUND.then(e -> e.placePortalTicket(pos));
+         } else if (result.canCreatePortal()) { // CraftBukkit
+@@ -247,7 +274,7 @@ public class NetherPortalBlock extends Block implements Portal {
+         return createDimensionTransition(newLevel, exitPortal, axis, offset, entity, postTeleportTransition);
+     }
+ 
+-    private static TeleportTransition createDimensionTransition(
++    public static TeleportTransition createDimensionTransition( // Folia - region threading - public
+         final ServerLevel newLevel,
+         final BlockUtil.FoundRectangle foundRectangle,
+         final Direction.Axis portalAxis,

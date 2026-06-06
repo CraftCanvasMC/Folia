@@ -1,0 +1,193 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/server/commands/AttributeCommand.java b/net/minecraft/server/commands/AttributeCommand.java
+index f01f0cc5624449d3464c14d4f86b60b2e38243b8..0dcf326b17aabecd1d90951ae4e2503b83a3d7dd 100644
+--- a/net/minecraft/server/commands/AttributeCommand.java
++++ b/net/minecraft/server/commands/AttributeCommand.java
+@@ -256,41 +256,80 @@ public class AttributeCommand {
+         }
+     }
+ 
++    // Folia start - region threading
++    private static void sendMessage(CommandSourceStack src, CommandSyntaxException ex) {
++        src.sendFailure((Component)ex.getRawMessage());
++    }
++    // Folia end - region threading
++
+     private static int getAttributeValue(final CommandSourceStack source, final Entity target, final Holder<Attribute> attribute, final double scale) throws CommandSyntaxException {
+-        LivingEntity livingEntity = getEntityWithAttribute(target, attribute);
++        // Folia start - region threading
++        target.getBukkitEntity().taskScheduler.scheduleOrExecute((Entity newTarget) -> {
++            try {
++                // Folia end - region threading
++        LivingEntity livingEntity = getEntityWithAttribute(newTarget, attribute); // Folia - region threading
+         double result = livingEntity.getAttributeValue(attribute);
+         source.sendSuccess(
+-            () -> Component.translatable("commands.attribute.value.get.success", getAttributeDescription(attribute), target.getName(), result), false
++            () -> Component.translatable("commands.attribute.value.get.success", getAttributeDescription(attribute), newTarget.getName(), result), false // Folia - region threading
+         );
+-        return (int)(result * scale);
++        return; // Folia - region threading
++        // Folia start - region threading
++            } catch (CommandSyntaxException ex) {
++                sendMessage(source, ex);
++            }
++        });
++        return 0;
++        // Folia end - region threading
+     }
+ 
+     private static int getAttributeBase(final CommandSourceStack source, final Entity target, final Holder<Attribute> attribute, final double scale) throws CommandSyntaxException {
+-        LivingEntity livingEntity = getEntityWithAttribute(target, attribute);
++        // Folia start - region threading
++        target.getBukkitEntity().taskScheduler.scheduleOrExecute((Entity newTarget) -> {
++            try {
++                // Folia end - region threading
++        LivingEntity livingEntity = getEntityWithAttribute(newTarget, attribute); // Folia - region threading
+         double result = livingEntity.getAttributeBaseValue(attribute);
+         source.sendSuccess(
+-            () -> Component.translatable("commands.attribute.base_value.get.success", getAttributeDescription(attribute), target.getName(), result), false
++            () -> Component.translatable("commands.attribute.base_value.get.success", getAttributeDescription(attribute), newTarget.getName(), result), false // Folia - region threading
+         );
+-        return (int)(result * scale);
++        return; // Folia - region threading
++        // Folia start - region threading
++            } catch (CommandSyntaxException ex) {
++                sendMessage(source, ex);
++            }
++        });
++        return 0;
++        // Folia end - region threading
+     }
+ 
+     private static int getAttributeModifier(
+         final CommandSourceStack source, final Entity target, final Holder<Attribute> attribute, final Identifier id, final double scale
+     ) throws CommandSyntaxException {
+-        LivingEntity livingEntity = getEntityWithAttribute(target, attribute);
++        // Folia start - region threading
++        target.getBukkitEntity().taskScheduler.scheduleOrExecute((Entity newTarget) -> {
++            try {
++                // Folia end - region threading
++        LivingEntity livingEntity = getEntityWithAttribute(newTarget, attribute); // Folia - region threading
+         AttributeMap attributes = livingEntity.getAttributes();
+         if (!attributes.hasModifier(attribute, id)) {
+-            throw ERROR_NO_SUCH_MODIFIER.create(target.getName(), getAttributeDescription(attribute), id);
++            throw ERROR_NO_SUCH_MODIFIER.create(newTarget.getName(), getAttributeDescription(attribute), id); // Folia - region threading
+         }
+ 
+         double result = attributes.getModifierValue(attribute, id);
+         source.sendSuccess(
+             () -> Component.translatable(
+-                "commands.attribute.modifier.value.get.success", Component.translationArg(id), getAttributeDescription(attribute), target.getName(), result
++                "commands.attribute.modifier.value.get.success", Component.translationArg(id), getAttributeDescription(attribute), newTarget.getName(), result // Folia - region threading
+             ),
+             false
+         );
+-        return (int)(result * scale);
++        return; // Folia - region threading
++        // Folia start - region threading
++            } catch (CommandSyntaxException ex) {
++                sendMessage(source, ex);
++            }
++        });
++        return 0;
++        // Folia end - region threading
+     }
+ 
+     private static Stream<Identifier> getAttributeModifiers(final Entity target, final Holder<Attribute> attribute) throws CommandSyntaxException {
+@@ -299,11 +338,22 @@ public class AttributeCommand {
+     }
+ 
+     private static int setAttributeBase(final CommandSourceStack source, final Entity target, final Holder<Attribute> attribute, final double value) throws CommandSyntaxException {
+-        getAttributeInstance(target, attribute).setBaseValue(value);
++        // Folia start - region threading
++        target.getBukkitEntity().taskScheduler.scheduleOrExecute((Entity newTarget) -> {
++            try {
++                // Folia end - region threading
++        getAttributeInstance(newTarget, attribute).setBaseValue(value); // Folia - region threading
+         source.sendSuccess(
+-            () -> Component.translatable("commands.attribute.base_value.set.success", getAttributeDescription(attribute), target.getName(), value), false
++            () -> Component.translatable("commands.attribute.base_value.set.success", getAttributeDescription(attribute), newTarget.getName(), value), false // Folia - region threading
+         );
+-        return 1;
++        return; // Folia - region threading
++        // Folia start - region threading
++            } catch (CommandSyntaxException ex) {
++                sendMessage(source, ex);
++            }
++        });
++        return 0;
++        // Folia end - region threading
+     }
+ 
+     private static int resetAttributeBase(final CommandSourceStack source, final Entity target, final Holder<Attribute> attribute) throws CommandSyntaxException {
+@@ -327,35 +377,57 @@ public class AttributeCommand {
+         final double value,
+         final AttributeModifier.Operation operation
+     ) throws CommandSyntaxException {
+-        AttributeInstance attributeInstance = getAttributeInstance(target, attribute);
++        // Folia start - region threading
++        target.getBukkitEntity().taskScheduler.scheduleOrExecute((Entity newTarget) -> {
++            try {
++                // Folia end - region threading
++        AttributeInstance attributeInstance = getAttributeInstance(newTarget, attribute); // Folia - region threading
+         AttributeModifier modifier = new AttributeModifier(id, value, operation);
+         if (attributeInstance.hasModifier(id)) {
+-            throw ERROR_MODIFIER_ALREADY_PRESENT.create(target.getName(), getAttributeDescription(attribute), id);
++            throw ERROR_MODIFIER_ALREADY_PRESENT.create(newTarget.getName(), getAttributeDescription(attribute), id); // Folia - region threading
+         }
+ 
+         attributeInstance.addPermanentModifier(modifier);
+         source.sendSuccess(
+             () -> Component.translatable(
+-                "commands.attribute.modifier.add.success", Component.translationArg(id), getAttributeDescription(attribute), target.getName()
++                "commands.attribute.modifier.add.success", Component.translationArg(id), getAttributeDescription(attribute), newTarget.getName() // Folia - region threading
+             ),
+             false
+         );
+-        return 1;
++        return; // Folia - region threading
++        // Folia start - region threading
++            } catch (CommandSyntaxException ex) {
++                sendMessage(source, ex);
++            }
++        });
++        return 0;
++        // Folia end - region threading
+     }
+ 
+     private static int removeModifier(final CommandSourceStack source, final Entity target, final Holder<Attribute> attribute, final Identifier id) throws CommandSyntaxException {
+-        AttributeInstance attributeInstance = getAttributeInstance(target, attribute);
++        // Folia start - region threading
++        target.getBukkitEntity().taskScheduler.scheduleOrExecute((Entity newTarget) -> {
++            try {
++                // Folia end - region threading
++        AttributeInstance attributeInstance = getAttributeInstance(newTarget, attribute); // Folia - region threading
+         if (attributeInstance.removeModifier(id)) {
+             source.sendSuccess(
+                 () -> Component.translatable(
+-                    "commands.attribute.modifier.remove.success", Component.translationArg(id), getAttributeDescription(attribute), target.getName()
++                    "commands.attribute.modifier.remove.success", Component.translationArg(id), getAttributeDescription(attribute), newTarget.getName() // Folia - region threading
+                 ),
+                 false
+             );
+-            return 1;
++            return; // Folia - region threading
+         } else {
+-            throw ERROR_NO_SUCH_MODIFIER.create(target.getName(), getAttributeDescription(attribute), id);
++            throw ERROR_NO_SUCH_MODIFIER.create(newTarget.getName(), getAttributeDescription(attribute), id); // Folia - region threading
+         }
++        // Folia start - region threading
++            } catch (CommandSyntaxException ex) {
++                sendMessage(source, ex);
++            }
++        });
++        return 0;
++        // Folia end - region threading
+     }
+ 
+     private static Component getAttributeDescription(final Holder<Attribute> attribute) {

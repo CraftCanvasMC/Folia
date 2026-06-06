@@ -1,0 +1,47 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/network/PacketProcessor.java b/net/minecraft/network/PacketProcessor.java
+index 408cb996fc8ff77785da8919f19baff2cf4bd789..0c84984fc72ae949c09300306783db23e0ed6cc0 100644
+--- a/net/minecraft/network/PacketProcessor.java
++++ b/net/minecraft/network/PacketProcessor.java
+@@ -19,6 +19,12 @@ public class PacketProcessor implements AutoCloseable {
+         this.runningThread = runningThread;
+     }
+ 
++    // Folia start - region threading
++    public boolean hasPackets() {
++        return !this.packetsToBeHandled.isEmpty();
++    }
++    // Folia end - region threading
++
+     // Paper start - improve tick loop
+     public final boolean executeSinglePacket() {
+         if (this.closed) {
+@@ -39,9 +45,9 @@ public class PacketProcessor implements AutoCloseable {
+         return Thread.currentThread() == this.runningThread;
+     }
+ 
+-    public <T extends PacketListener> void scheduleIfPossible(final T listener, final Packet<T> packet) {
++    public <T extends PacketListener> boolean scheduleIfPossible(final T listener, final Packet<T> packet) { // Folia - region threading - return whether to notify
+         if (this.closed) {
+-            throw new io.papermc.paper.util.ServerStopRejectedExecutionException("Server already shutting down"); // Paper - do not prematurely disconnect players on stop
++            throw new io.papermc.paper.util.ServerStopRejectedExecutionException("Packet processor is shut down"); // Paper - do not prematurely disconnect players on stop // Folia - region threading - change exception message
+         }
+         // Paper start - improve tick loop
+         // wake up main thread inbetween ticks to process packets
+@@ -52,9 +58,10 @@ public class PacketProcessor implements AutoCloseable {
+             // only unpark if we are the first packet OR are at the head of the queue
+             // we unpark if we are at the head in case the main thread emptied the queue
+             // immediately before we added but after checking isEmpty
+-            java.util.concurrent.locks.LockSupport.unpark(this.runningThread);
++            return true; // Folia - region threading - return whether to notify
+         }
+         // Paper end - improve tick loop
++        return false; // Folia - region threading - return whether to notify
+     }
+ 
+     public void processQueuedPackets() {

@@ -1,0 +1,28 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/world/item/SignItem.java b/net/minecraft/world/item/SignItem.java
+index 3b84ebb898c867289eaef934321b5252db21a708..ee68fe2636b35f4a755ccfa7fb60ca66b32dfffc 100644
+--- a/net/minecraft/world/item/SignItem.java
++++ b/net/minecraft/world/item/SignItem.java
+@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.state.BlockState;
+ import org.jspecify.annotations.Nullable;
+ 
+ public class SignItem extends StandingAndWallBlockItem {
+-    public static BlockPos openSign; // CraftBukkit
++    public static final ThreadLocal<BlockPos> openSign = new ThreadLocal<>(); // CraftBukkit // Folia - region threading
+     public SignItem(final Block sign, final Block wallSign, final Item.Properties properties) {
+         super(sign, wallSign, Direction.DOWN, properties);
+     }
+@@ -32,7 +32,7 @@ public class SignItem extends StandingAndWallBlockItem {
+             && level.getBlockState(pos).getBlock() instanceof SignBlock sign) {
+             // CraftBukkit start - SPIGOT-4678
+             // sign.openTextEdit(player, signEntity, true);
+-            SignItem.openSign = pos;
++            SignItem.openSign.set(pos); // Folia - region threading
+             // CraftBukkit end
+         }
+ 

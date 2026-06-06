@@ -1,0 +1,35 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/ca/spottedleaf/moonrise/paper/PaperHooks.java b/ca/spottedleaf/moonrise/paper/PaperHooks.java
+index 4a3f07daad8b48eaf3bea02bdacbfb0670dddf90..08e3c75672e95248140eb0e0907cae5fbe54da34 100644
+--- a/ca/spottedleaf/moonrise/paper/PaperHooks.java
++++ b/ca/spottedleaf/moonrise/paper/PaperHooks.java
+@@ -108,7 +108,7 @@ public final class PaperHooks extends BaseChunkSystemHooks implements PlatformHo
+         }
+ 
+         for (final EnderDragonPart part : parts) {
+-            if (part != entity && part.getBoundingBox().intersects(boundingBox) && (predicate == null || predicate.test(part))) {
++            if (part != entity && part.getBoundingBox().intersects(boundingBox) && ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(part) && (predicate == null || predicate.test(part))) { // Folia - region threading
+                 into.add(part);
+             }
+         }
+@@ -130,7 +130,7 @@ public final class PaperHooks extends BaseChunkSystemHooks implements PlatformHo
+                 continue;
+             }
+             final T casted = (T)entityTypeTest.tryCast(part);
+-            if (casted != null && (predicate == null || predicate.test(casted))) {
++            if (casted != null && ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(part) && (predicate == null || predicate.test(casted))) { // Folia - region threading
+                 into.add(casted);
+                 if (into.size() >= maxCount) {
+                     break;
+@@ -308,4 +308,4 @@ public final class PaperHooks extends BaseChunkSystemHooks implements PlatformHo
+     public boolean addTicketForEnderPearls(final ServerLevel world) {
+         return !world.paperConfig().misc.legacyEnderPearlBehavior;
+     }
+-}
+\ No newline at end of file
++}

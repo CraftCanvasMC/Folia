@@ -1,0 +1,31 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/world/entity/npc/CatSpawner.java b/net/minecraft/world/entity/npc/CatSpawner.java
+index 3c745f35075a59a6055ba2d43b364b238089138f..5a22dd8cbe71f16af753dff5c4db7f6435d69801 100644
+--- a/net/minecraft/world/entity/npc/CatSpawner.java
++++ b/net/minecraft/world/entity/npc/CatSpawner.java
+@@ -17,14 +17,15 @@ import net.minecraft.world.phys.AABB;
+ 
+ public class CatSpawner implements CustomSpawner {
+     private static final int TICK_DELAY = 1200;
+-    private int nextTick;
++    //private int nextTick; // Folia - region threading
+ 
+     @Override
+     public void tick(final ServerLevel level, final boolean spawnEnemies) {
+-        this.nextTick--;
+-        if (this.nextTick <= 0) {
+-            this.nextTick = 1200;
+-            Player player = level.getRandomPlayer();
++        final io.papermc.paper.threadedregions.RegionizedWorldData worldData = level.getCurrentWorldData(); // Folia - region threading
++        worldData.catSpawnerNextTick--; // Folia - region threading
++        if (worldData.catSpawnerNextTick <= 0) { // Folia - region threading
++            worldData.catSpawnerNextTick = 1200; // Folia - region threading
++            Player player = level.getRandomLocalPlayer(); // Folia - region threading
+             if (player != null) {
+                 RandomSource random = level.getRandom();
+                 int x = (8 + random.nextInt(24)) * (random.nextBoolean() ? -1 : 1);

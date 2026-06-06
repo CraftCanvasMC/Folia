@@ -1,0 +1,28 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/ca/spottedleaf/moonrise/patches/collisions/CollisionUtil.java b/ca/spottedleaf/moonrise/patches/collisions/CollisionUtil.java
+index de764da80793d272ff597b4a0742ce785838799a..cc67d950846bdd45271024701f24dc8d7b79c889 100644
+--- a/ca/spottedleaf/moonrise/patches/collisions/CollisionUtil.java
++++ b/ca/spottedleaf/moonrise/patches/collisions/CollisionUtil.java
+@@ -1940,6 +1940,17 @@ public final class CollisionUtil {
+ 
+         for (int currChunkZ = minChunkZ; currChunkZ <= maxChunkZ; ++currChunkZ) {
+             for (int currChunkX = minChunkX; currChunkX <= maxChunkX; ++currChunkX) {
++                // Folia start - region threading
++                if (!ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(world, currChunkX, currChunkZ, 4)) {
++                    if (checkOnly) {
++                        return true;
++                    } else {
++                        intoAABB.add(getBoxForChunk(currChunkX, currChunkZ));
++                        ret = true;
++                        continue;
++                    }
++                }
++                // Folia end - region threading
+                 final ChunkAccess chunk = chunkSource.getChunk(currChunkX, currChunkZ, ChunkStatus.FULL, loadChunks);
+ 
+                 if (chunk == null) {

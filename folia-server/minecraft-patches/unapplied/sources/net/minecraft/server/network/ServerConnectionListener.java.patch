@@ -1,0 +1,36 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/server/network/ServerConnectionListener.java b/net/minecraft/server/network/ServerConnectionListener.java
+index 474b7f06223514d95bad3d91356dfaa5435b77f5..fe27bc7d9bd24ab2d86177286b4bfe512437b685 100644
+--- a/net/minecraft/server/network/ServerConnectionListener.java
++++ b/net/minecraft/server/network/ServerConnectionListener.java
+@@ -134,12 +134,15 @@ public class ServerConnectionListener {
+                                     }
+                                     // Paper end - Add support for proxy protocol
+                                     // ServerConnectionListener.this.connections.add(connection); // Paper - prevent blocking on adding a new connection while the server is ticking
+-                                    ServerConnectionListener.this.pending.add(connection); // Paper - prevent blocking on adding a new connection while the server is ticking
++                                    //ServerConnectionListener.this.pending.add(connection); // Paper - prevent blocking on adding a new connection while the server is ticking // Folia - connection fixes - move down
+                                     connection.configurePacketHandler(pipeline);
+                                     connection.setListenerForServerboundHandshake(
+                                         new ServerHandshakePacketListenerImpl(ServerConnectionListener.this.server, connection)
+                                     );
+                                     io.papermc.paper.network.ChannelInitializeListenerHolder.callListeners(channel); // Paper - Add Channel initialization listeners
++                                    // Folia start - regionised threading
++                                    io.papermc.paper.threadedregions.RegionizedServer.getInstance().addConnection(connection);
++                                    // Folia end - regionised threading
+                                 }
+                             }
+                         )
+@@ -216,7 +219,7 @@ public class ServerConnectionListener {
+             // Spigot start
+             this.addPending(); // Paper - prevent blocking on adding a new connection while the server is ticking
+             // This prevents players from 'gaming' the server, and strategically relogging to increase their position in the tick order
+-            if (org.spigotmc.SpigotConfig.playerShuffle > 0 && MinecraftServer.currentTick % org.spigotmc.SpigotConfig.playerShuffle == 0) {
++            if (org.spigotmc.SpigotConfig.playerShuffle > 0 && 0 % org.spigotmc.SpigotConfig.playerShuffle == 0) { // Folia - region threading
+                 Collections.shuffle(this.connections);
+             }
+             // Spigot end

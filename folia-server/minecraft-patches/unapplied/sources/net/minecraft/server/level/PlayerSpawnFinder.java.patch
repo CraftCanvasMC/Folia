@@ -1,0 +1,67 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/server/level/PlayerSpawnFinder.java b/net/minecraft/server/level/PlayerSpawnFinder.java
+index a7799e8c12713e00124f2caf69f74a616b1af3e7..b233362a2d9298a91a5d615e6353f0aa058127bd 100644
+--- a/net/minecraft/server/level/PlayerSpawnFinder.java
++++ b/net/minecraft/server/level/PlayerSpawnFinder.java
+@@ -26,7 +26,7 @@ import net.minecraft.world.phys.Vec3;
+ import org.jspecify.annotations.Nullable;
+ 
+ public class PlayerSpawnFinder {
+-    private static final EntityDimensions PLAYER_DIMENSIONS = EntityType.PLAYER.getDimensions();
++    public static final EntityDimensions PLAYER_DIMENSIONS = EntityType.PLAYER.getDimensions(); // Folia - region threading - public
+     private static final int ABSOLUTE_MAX_ATTEMPTS = 1024;
+     private final ServerLevel level;
+     private final BlockPos spawnSuggestion;
+@@ -116,9 +116,13 @@ public class PlayerSpawnFinder {
+             int chunkX = SectionPos.blockToSectionCoord(candidateX);
+             int chunkZ = SectionPos.blockToSectionCoord(candidateZ);
+             ((ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemServerLevel)this.level) // Paper - rewrite chunk system
+-                .moonrise$getChunkTaskScheduler().chunkHolderManager // Paper - rewrite chunk system
+-                .addTicketAndLoadWithRadius(TicketType.SPAWN_SEARCH, new ChunkPos(chunkX, chunkZ), 0, net.minecraft.world.level.chunk.status.ChunkStatus.FULL, ca.spottedleaf.concurrentutil.util.Priority.HIGH) // Paper - rewrite chunk system
+-                .whenCompleteAsync((ignored, throwable) -> {
++                    // Folia start - region threading
++                    .moonrise$getChunkTaskScheduler().scheduleChunkLoad( // Paper - rewrite chunk system
++                            chunkX, chunkZ, net.minecraft.world.level.chunk.status.ChunkStatus.FULL, true,
++                            ca.spottedleaf.concurrentutil.util.Priority.HIGHER,
++                            (final net.minecraft.world.level.chunk.ChunkAccess object) -> {
++                                Throwable throwable = null;
++                                // Folia end - region threading
+                     if (throwable == null) {
+                         try {
+                             Optional<Vec3> spawnPos = candidateChecker.get();
+@@ -141,13 +145,13 @@ public class PlayerSpawnFinder {
+                         details.setDetail("Progress", () -> candidateIndex + " out of " + this.candidateCount);
+                         this.finishedFuture.completeExceptionally(new ReportedException(report));
+                     }
+-                }, this.level.chunkSource.mainThreadProcessor); // Paper - rewrite chunk system
++                }); // Paper - rewrite chunk system // Folia - region threading
+         }
+     }
+ 
+     protected static @Nullable BlockPos getOverworldRespawnPos(final ServerLevel level, final int x, final int z) {
+         boolean caveWorld = level.dimensionType().hasCeiling();
+-        LevelChunk chunk = level.getChunk(SectionPos.blockToSectionCoord(x), SectionPos.blockToSectionCoord(z));
++        net.minecraft.world.level.chunk.ChunkAccess chunk = level.moonrise$getChunkTaskScheduler().syncLoadNonFull(SectionPos.blockToSectionCoord(x), SectionPos.blockToSectionCoord(z), net.minecraft.world.level.chunk.status.ChunkStatus.SPAWN); // Folia - region threading
+         int topY = caveWorld ? level.getChunkSource().getGenerator().getSpawnHeight(level) : chunk.getHeight(Heightmap.Types.MOTION_BLOCKING, x & 15, z & 15);
+         if (topY < level.getMinY()) {
+             return null;
+@@ -162,12 +166,12 @@ public class PlayerSpawnFinder {
+ 
+         for (int y = topY + 1; y >= level.getMinY(); y--) {
+             pos.set(x, y, z);
+-            BlockState blockState = level.getBlockState(pos);
++            BlockState blockState = chunk.getBlockState(pos); // Folia - region threading
+             if (!blockState.getFluidState().isEmpty()) {
+                 break;
+             }
+ 
+-            if (Block.isFaceFull(blockState.getCollisionShape(level, pos), Direction.UP)) {
++            if (Block.isFaceFull(blockState.getCollisionShape(chunk, pos), Direction.UP)) { // Folia - region threading
+                 return pos.above().immutable();
+             }
+         }

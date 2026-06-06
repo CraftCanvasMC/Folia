@@ -1,0 +1,71 @@
+From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
+From: File <noreply+automated@papermc.io>
+Date: Sun, 20 Apr 1997 15:37:42 +0200
+Subject: [PATCH] folia File Patches
+
+
+diff --git a/net/minecraft/world/item/MapItem.java b/net/minecraft/world/item/MapItem.java
+index f4ad2aa954befed7070559446531621732ac85e0..9c06b9affec26b9eadc038885ff0435fd0209bdf 100644
+--- a/net/minecraft/world/item/MapItem.java
++++ b/net/minecraft/world/item/MapItem.java
+@@ -74,6 +74,7 @@ public class MapItem extends Item {
+     }
+ 
+     public void update(final Level level, final Entity player, final MapItemSavedData data) {
++        synchronized (data) { // Folia - make map data thread-safe
+         if (level.dimension() == data.dimension && player instanceof Player) {
+             int scale = 1 << data.scale;
+             int centerX = data.centerX;
+@@ -103,10 +104,10 @@ public class MapItem extends Item {
+                             int averagingAreaMinX = (centerX / scale + imgX - 64) * scale;
+                             int averagingAreaMinZ = (centerZ / scale + imgY - 64) * scale;
+                             Multiset<MapColor> colorCount = LinkedHashMultiset.create();
+-                            LevelChunk chunk = level.getChunkIfLoaded( // Paper - Maps shouldn't load chunks
++                            LevelChunk chunk = level.getChunkIfLoaded( // Paper - Maps shouldn't load chunks // Folia - super important that it uses getChunkIfLoaded
+                                 SectionPos.blockToSectionCoord(averagingAreaMinX), SectionPos.blockToSectionCoord(averagingAreaMinZ)
+                             );
+-                            if (chunk != null && !chunk.isEmpty()) { // Paper - Maps shouldn't load chunks
++                            if (chunk != null && !chunk.isEmpty() && ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(level, chunk.getPos())) { // Paper - Maps shouldn't load chunks // Folia - make sure chunk is owned
+                                 int waterDepth = 0;
+                                 double averageAreaHeight = 0.0;
+                                 if (level.dimensionType().hasCeiling()) {
+@@ -188,6 +189,7 @@ public class MapItem extends Item {
+                 }
+             }
+         }
++        } // Folia - make map data thread-safe
+     }
+ 
+     private BlockState getCorrectStateForFluidBlock(final Level level, final BlockState state, final BlockPos pos) {
+@@ -202,6 +204,7 @@ public class MapItem extends Item {
+     public static void renderBiomePreviewMap(final ServerLevel level, final ItemStack mapItemStack) {
+         MapItemSavedData data = getSavedData(mapItemStack, level);
+         if (data != null) {
++            synchronized (data) { // Folia - make map data thread-safe
+             if (level.dimension() == data.dimension) {
+                 int scale = 1 << data.scale;
+                 int centerX = data.centerX;
+@@ -271,6 +274,7 @@ public class MapItem extends Item {
+                     }
+                 }
+             }
++            } // Folia - make map data thread-safe
+         }
+     }
+ 
+@@ -278,6 +282,7 @@ public class MapItem extends Item {
+     public void inventoryTick(final ItemStack itemStack, final ServerLevel level, final Entity owner, final @Nullable EquipmentSlot slot) {
+         MapItemSavedData data = getSavedData(itemStack, level);
+         if (data != null) {
++            synchronized (data) { // Folia - region threading
+             if (owner instanceof Player player) {
+                 data.tickCarriedBy(player, itemStack, null);
+             }
+@@ -285,6 +290,7 @@ public class MapItem extends Item {
+             if (!data.locked && slot != null && slot.getType() == EquipmentSlot.Type.HAND) {
+                 this.update(level, owner, data);
+             }
++            } // Folia - region threading
+         }
+     }
+ 
