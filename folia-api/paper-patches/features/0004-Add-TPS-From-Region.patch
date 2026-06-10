@@ -5,7 +5,7 @@ Subject: [PATCH] Add TPS From Region
 
 
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index 1df6ee5a946dcfc64348c347bef97bb845cfa192..8d6a88c1431536a75b0afb30b912eb871d73813c 100644
+index 6dc049664394818adea57835838afc448a4dd9f5..be2817ecbb7867d1b983b7847142a2cd76b96536 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
 @@ -2990,6 +2990,42 @@ public final class Bukkit {
@@ -52,7 +52,7 @@ index 1df6ee5a946dcfc64348c347bef97bb845cfa192..8d6a88c1431536a75b0afb30b912eb87
      /**
       * @deprecated All methods on this class have been deprecated, see the individual methods for replacements.
 diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
-index 6802b54dd2459311b2160a77a19a3f624f8e969c..bd34ddae6f1cb9f1e3c225981cd53456f5166149 100644
+index 62341f72e8457c5547994bee1f3fda9faade6ce0..fb5ca3ab0ddba433a39e65572beeb955b50d6f72 100644
 --- a/src/main/java/org/bukkit/Server.java
 +++ b/src/main/java/org/bukkit/Server.java
 @@ -2776,4 +2776,34 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi

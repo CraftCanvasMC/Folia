@@ -5,10 +5,10 @@ Subject: [PATCH] Add TPS From Region
 
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 67eadcedd534d8e2cb726a4578749ef42e9faeb4..e47f068369d716fcd9749c1564ae293e4426825a 100644
+index d9d24772f1c2cd05f40c43fc7da5d7b1541932f0..7be9acc7d124d786870b15dcc7cd4979eec37729 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -3028,4 +3028,69 @@ public final class CraftServer implements Server {
+@@ -3032,4 +3032,69 @@ public final class CraftServer implements Server {
      public void allowPausing(final Plugin plugin, final boolean value) {
          this.console.addPluginAllowingSleep(plugin.getName(), value);
      }
