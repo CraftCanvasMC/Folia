@@ -931,7 +931,7 @@ index 622d023bf1e0c4a5e383fd20447cc156be873ad4..d9d24772f1c2cd05f40c43fc7da5d7b1
  
      @Override
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-index 2c4465a7c8c7f3679574159a7ea6d4dfcbe697ab..e784314bc0ece939f75d4e47ba34056052c940bc 100644
+index 9d1b0ddd98f4647989acab1bc943f3e3966dfd3f..cf4f22caae03f0741658b0f93d073d3fc76798d1 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 @@ -244,7 +244,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
@@ -1491,7 +1491,7 @@ index f117b5fdb0d158fb0754a11fbf4fc4ddf19ff050..3545b3b1dcaebc38997bda4cd8b25149
          } else {
              this.snapshot = this.createSnapshot(blockEntity);
 diff --git a/src/main/java/org/bukkit/craftbukkit/block/CraftBlockState.java b/src/main/java/org/bukkit/craftbukkit/block/CraftBlockState.java
-index dea679e7c30fc1a468b3b911e9314a243bea291b..0fcb1e1ccd51fab204bf248e78dbace65499117a 100644
+index 8380df946b0e4769afd782fef7992794b1342a17..74b457a3170b4e63567b21e391a55987fd850d52 100644
 --- a/src/main/java/org/bukkit/craftbukkit/block/CraftBlockState.java
 +++ b/src/main/java/org/bukkit/craftbukkit/block/CraftBlockState.java
 @@ -217,6 +217,12 @@ public class CraftBlockState implements BlockState {
@@ -2707,7 +2707,7 @@ index 32e426513f3e710abeda3363a4e2a08fe902c703..2655d6c0c58c27bd532d13fab723863c
      }
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java
-index e3c2827cf5c00724d13652c22c14adee2bd8ff74..8226c74bdb89cfa56234fa46c95bfb1af330cca4 100644
+index d1448cf50f15110e579b70f4fa15bf7c66394a77..be7509f62ea58a9458a80895ccdedbf575d5f1c4 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java
 @@ -115,6 +115,7 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
@@ -3815,10 +3815,10 @@ index 6ad86ba7abac537b42f8bb43bbb8d984cbbdf052..f6880ff590fdd3e30562a24de00c6a21
      }
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-index a3f9ebbd03c355168c8ea72e8d9f0e222712c61d..73c87252deee3e6dc50c5503fbf228aedf6f8486 100644
+index 72bc687efb64e0b3b3802775b2d1b8b133b092fb..f6446e294565f9866b3cb1a1ed099f0a56ae4e18 100644
 --- a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
 +++ b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-@@ -929,7 +929,7 @@ public class CraftEventFactory {
+@@ -931,7 +931,7 @@ public class CraftEventFactory {
          return false;
      }
  
@@ -3827,7 +3827,7 @@ index a3f9ebbd03c355168c8ea72e8d9f0e222712c61d..73c87252deee3e6dc50c5503fbf228ae
  
      public static boolean handleBlockSpreadEvent(LevelAccessor level, BlockPos source, BlockPos target, net.minecraft.world.level.block.state.BlockState state, @net.minecraft.world.level.block.Block.UpdateFlags int flags) {
          return handleBlockSpreadEvent(level, source, target, state, flags, false);
-@@ -945,7 +945,7 @@ public class CraftEventFactory {
+@@ -947,7 +947,7 @@ public class CraftEventFactory {
          CraftBlockState snapshot = CraftBlockStates.getBlockState(level, target);
          snapshot.setBlock(state);
  
