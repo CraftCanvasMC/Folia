@@ -1,14 +1,6 @@
-From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
-From: File <noreply+automated@papermc.io>
-Date: Sun, 20 Apr 1997 15:37:42 +0200
-Subject: [PATCH] folia File Patches
-
-
-diff --git a/net/minecraft/world/level/Level.java b/net/minecraft/world/level/Level.java
-index 56659181dc817ea028428eabf5937308c04b8cc5..31f32ae572191a5a3077219953e4dcf423463ebe 100644
 --- a/net/minecraft/world/level/Level.java
 +++ b/net/minecraft/world/level/Level.java
-@@ -118,10 +118,10 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -119,10 +_,10 @@
          .add(new ExplosionParticleInfo(ParticleTypes.POOF, 0.5F, 1.0F))
          .add(new ExplosionParticleInfo(ParticleTypes.SMOKE, 1.0F, 1.0F))
          .build();
@@ -23,7 +15,7 @@ index 56659181dc817ea028428eabf5937308c04b8cc5..31f32ae572191a5a3077219953e4dcf4
      public final Thread thread;
      private final boolean isDebug;
      private int skyDarken;
-@@ -131,7 +131,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -132,7 +_,7 @@
      public float rainLevel;
      protected float oThunderLevel;
      public float thunderLevel;
@@ -32,7 +24,7 @@ index 56659181dc817ea028428eabf5937308c04b8cc5..31f32ae572191a5a3077219953e4dcf4
      @Deprecated
      private final RandomSource soundSeedGenerator = RandomSource.createThreadSafe();
      private final Holder<DimensionType> dimensionTypeRegistration;
-@@ -142,27 +142,17 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -143,27 +_,17 @@
      private final RegistryAccess registryAccess;
      private final DamageSources damageSources;
      private final PalettedContainerFactory palettedContainerFactory;
@@ -64,7 +56,7 @@ index 56659181dc817ea028428eabf5937308c04b8cc5..31f32ae572191a5a3077219953e4dcf4
      public final org.spigotmc.SpigotWorldConfig spigotConfig; // Spigot
      // Paper start - add paper world config
      private final io.papermc.paper.configuration.WorldConfiguration paperConfig;
-@@ -172,8 +162,8 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -173,8 +_,8 @@
      // Paper end - add paper world config
  
      public static @Nullable BlockPos lastPhysicsProblem; // Spigot
@@ -75,7 +67,7 @@ index 56659181dc817ea028428eabf5937308c04b8cc5..31f32ae572191a5a3077219953e4dcf4
  
      public CraftWorld getWorld() {
          return this.world;
-@@ -822,6 +812,32 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -823,6 +_,32 @@
          return chunk != null ? chunk.getNoiseBiome(x, y, z) : this.getUncachedNoiseBiome(x, y, z);
      }
      // Paper end - optimise random ticking
@@ -108,7 +100,7 @@ index 56659181dc817ea028428eabf5937308c04b8cc5..31f32ae572191a5a3077219953e4dcf4
  
      protected Level(
          final WritableLevelData levelData,
-@@ -868,7 +884,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -869,7 +_,7 @@
          this.thread = Thread.currentThread();
          this.biomeManager = new BiomeManager(this, biomeZoomSeed);
          this.isDebug = isDebug;
@@ -117,7 +109,7 @@ index 56659181dc817ea028428eabf5937308c04b8cc5..31f32ae572191a5a3077219953e4dcf4
          this.registryAccess = registryAccess;
          this.palettedContainerFactory = PalettedContainerFactory.create(registryAccess);
          this.damageSources = new DamageSources(registryAccess);
-@@ -986,8 +1002,8 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -991,8 +_,8 @@
      @Nullable
      public final BlockState getBlockStateIfLoaded(BlockPos pos) {
          // CraftBukkit start - tree generation
@@ -128,10 +120,10 @@ index 56659181dc817ea028428eabf5937308c04b8cc5..31f32ae572191a5a3077219953e4dcf4
              if (previous != null) {
                  return previous.getHandle();
              }
-@@ -1050,16 +1066,18 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -1055,16 +_,18 @@
  
      @Override
-     public boolean setBlock(final BlockPos pos, final BlockState blockState, @Block.UpdateFlags final int updateFlags, final int updateLimit) {
+     public boolean setBlock(final BlockPos pos, final BlockState blockState, final @Block.UpdateFlags int updateFlags, final int updateLimit) {
 +        ca.spottedleaf.moonrise.common.util.TickThread.ensureTickThread((ServerLevel)this, pos, "Updating block asynchronously"); // Folia - region threading
 +        final io.papermc.paper.threadedregions.RegionizedWorldData worldData = this.getCurrentWorldData(); // Folia - region threading
          // CraftBukkit start - tree generation
@@ -150,7 +142,7 @@ index 56659181dc817ea028428eabf5937308c04b8cc5..31f32ae572191a5a3077219953e4dcf4
              }
              blockstate.setBlock(blockState);
              blockstate.setFlags(updateFlags);
-@@ -1078,14 +1096,14 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -1083,14 +_,14 @@
          Block block = blockState.getBlock();
          // CraftBukkit start - capture blockstates
          boolean captured = false;
@@ -169,7 +161,7 @@ index 56659181dc817ea028428eabf5937308c04b8cc5..31f32ae572191a5a3077219953e4dcf4
              }
              snapshot.setFlags(updateFlags); // Paper - always set the flag of the most recent call to mitigate issues with multiple update at the same pos with different flags
          }
-@@ -1094,8 +1112,8 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -1099,8 +_,8 @@
          this.chunkPacketBlockController.onBlockChange(this, pos, blockState, oldState, updateFlags, updateLimit); // Paper - Anti-Xray
          if (oldState == null) {
              // CraftBukkit start - remove blockstate if failed (or the same)
@@ -180,7 +172,7 @@ index 56659181dc817ea028428eabf5937308c04b8cc5..31f32ae572191a5a3077219953e4dcf4
              }
              // CraftBukkit end
              return false;
-@@ -1133,7 +1151,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -1138,7 +_,7 @@
          */ // CraftBukkit
  
          // CraftBukkit start
@@ -189,7 +181,7 @@ index 56659181dc817ea028428eabf5937308c04b8cc5..31f32ae572191a5a3077219953e4dcf4
              // Modularize client and physic updates
              // Spigot start
              try {
-@@ -1172,7 +1190,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -1177,7 +_,7 @@
                  // CraftBukkit start
                  oldState.updateIndirectNeighbourShapes(this, pos, neighbourUpdateFlags, updateLimit - 1); // Don't call an event for the old block to limit event spam
                  boolean cancelledUpdates = false; // Paper - Fix block place logic
@@ -198,8 +190,8 @@ index 56659181dc817ea028428eabf5937308c04b8cc5..31f32ae572191a5a3077219953e4dcf4
                      org.bukkit.event.block.BlockPhysicsEvent event = new org.bukkit.event.block.BlockPhysicsEvent(org.bukkit.craftbukkit.block.CraftBlock.at(this, pos), blockState.asBlockData());
                      cancelledUpdates = !event.callEvent(); // Paper - Fix block place logic
                  }
-@@ -1277,7 +1295,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
-         @Block.UpdateFlags final int updateFlags,
+@@ -1283,7 +_,7 @@
+         final @Block.UpdateFlags int updateFlags,
          final int updateLimit
      ) {
 -        this.neighborUpdater.shapeUpdate(direction, neighborState, pos, neighborPos, updateFlags, updateLimit);
@@ -207,7 +199,7 @@ index 56659181dc817ea028428eabf5937308c04b8cc5..31f32ae572191a5a3077219953e4dcf4
      }
  
      @Override
-@@ -1301,11 +1319,34 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -1307,11 +_,34 @@
          return this.getChunkSource().getLightEngine();
      }
  
@@ -244,7 +236,7 @@ index 56659181dc817ea028428eabf5937308c04b8cc5..31f32ae572191a5a3077219953e4dcf4
              if (previous != null) {
                  return previous.getHandle();
              }
-@@ -1476,15 +1517,14 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -1482,15 +_,14 @@
  
      public void addBlockEntityTicker(final TickingBlockEntity ticker) {
          if (!this.paperConfig().unsupportedSettings.ticking.blockEntities) return; // Paper - option to disable ticking
@@ -265,7 +257,7 @@ index 56659181dc817ea028428eabf5937308c04b8cc5..31f32ae572191a5a3077219953e4dcf4
  
          // Paper - Fix MC-117075 use removeAll - remove iterator in favour of indexed for loop, ensuring compile error if something uses iter incorrectly
          boolean tickBlockEntities = this.tickRateManager().runsNormally();
-@@ -1493,8 +1533,8 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -1499,8 +_,8 @@
          // Paper start - Fix MC-117075 use removeAll
          final it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet<@Nullable TickingBlockEntity> toRemove = new it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet<>();
          toRemove.add(null);
@@ -276,7 +268,7 @@ index 56659181dc817ea028428eabf5937308c04b8cc5..31f32ae572191a5a3077219953e4dcf4
          // Paper end - Fix MC-117075 use removeAll
              if (ticker.isRemoved()) {
                  toRemove.add(ticker); // Paper - Fix MC-117075 use removeAll
-@@ -1508,8 +1548,8 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -1514,8 +_,8 @@
              }
          }
  
@@ -287,7 +279,7 @@ index 56659181dc817ea028428eabf5937308c04b8cc5..31f32ae572191a5a3077219953e4dcf4
      }
  
      public <T extends Entity> void guardEntityTick(final Consumer<T> tick, final T entity) {
-@@ -1520,7 +1560,8 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -1526,7 +_,8 @@
              final String msg = String.format("Entity threw exception at %s:%s,%s,%s", io.papermc.paper.util.MCUtil.getLevelName(entity.level()), entity.getX(), entity.getY(), entity.getZ());
              MinecraftServer.LOGGER.error(msg, t);
              getCraftServer().getPluginManager().callEvent(new com.destroystokyo.paper.event.server.ServerExceptionEvent(new com.destroystokyo.paper.exception.ServerInternalException(msg, t))); // Paper - ServerExceptionEvent
@@ -297,7 +289,7 @@ index 56659181dc817ea028428eabf5937308c04b8cc5..31f32ae572191a5a3077219953e4dcf4
              // Paper end - Prevent block entity and entity crashes
          }
          this.moonrise$midTickTasks(); // Paper - rewrite chunk system
-@@ -1674,9 +1715,14 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -1680,9 +_,14 @@
  
      @Override
      public @Nullable BlockEntity getBlockEntity(final BlockPos pos) {
@@ -313,7 +305,7 @@ index 56659181dc817ea028428eabf5937308c04b8cc5..31f32ae572191a5a3077219953e4dcf4
              return blockEntity;
          }
          // Paper end - Perf: Optimize capturedTileEntities lookup
-@@ -1693,8 +1739,8 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -1699,8 +_,8 @@
          BlockPos pos = blockEntity.getBlockPos();
          if (this.isInValidBounds(pos)) {
              // CraftBukkit start
@@ -324,7 +316,7 @@ index 56659181dc817ea028428eabf5937308c04b8cc5..31f32ae572191a5a3077219953e4dcf4
                  return;
              }
              // CraftBukkit end
-@@ -1762,6 +1808,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -1768,6 +_,7 @@
  
      @Override
      public List<Entity> getEntities(final @Nullable Entity except, final AABB bb, final Predicate<? super Entity> selector) {
@@ -332,7 +324,7 @@ index 56659181dc817ea028428eabf5937308c04b8cc5..31f32ae572191a5a3077219953e4dcf4
          Profiler.get().incrementCounter("getEntities");
          // Paper start - rewrite chunk system
          final List<Entity> ret = new java.util.ArrayList<>();
-@@ -1791,6 +1838,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -1797,6 +_,7 @@
      public <T extends Entity> void getEntities(final EntityTypeTest<Entity, T> entityTypeTest,
                                                 final AABB boundingBox, final Predicate<? super T> predicate,
                                                 final List<? super T> into, final int maxCount) {
@@ -340,7 +332,7 @@ index 56659181dc817ea028428eabf5937308c04b8cc5..31f32ae572191a5a3077219953e4dcf4
          Profiler.get().incrementCounter("getEntities");
  
          if (entityTypeTest instanceof net.minecraft.world.entity.EntityType<T> byType) {
-@@ -1929,6 +1977,20 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -1935,6 +_,20 @@
      public void onBlockEntityAdded(final BlockEntity blockEntity) {
      }
  
@@ -361,7 +353,7 @@ index 56659181dc817ea028428eabf5937308c04b8cc5..31f32ae572191a5a3077219953e4dcf4
      public long getOverworldClockTime() {
          return this.getClockTimeTicks(this.registryAccess().get(WorldClocks.OVERWORLD));
      }
-@@ -2109,8 +2171,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -2115,8 +_,7 @@
      public abstract RecipeAccess recipeAccess();
  
      public BlockPos getBlockRandomPos(final int xo, final int yo, final int zo, final int yMask) {
@@ -371,7 +363,7 @@ index 56659181dc817ea028428eabf5937308c04b8cc5..31f32ae572191a5a3077219953e4dcf4
          return new BlockPos(xo + (val & 15), yo + (val >> 16 & yMask), zo + (val >> 8 & 15));
      }
  
-@@ -2131,7 +2192,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -2137,7 +_,7 @@
  
      @Override
      public long nextSubTickCount() {
