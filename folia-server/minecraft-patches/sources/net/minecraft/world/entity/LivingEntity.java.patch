@@ -1,14 +1,6 @@
-From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
-From: File <noreply+automated@papermc.io>
-Date: Sun, 20 Apr 1997 15:37:42 +0200
-Subject: [PATCH] folia File Patches
-
-
-diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/entity/LivingEntity.java
-index 358ff4330102a058c86d8209374d8cb9dd18b6ad..2723fcc670504a25bc0402d1842ac23e9a82a518 100644
 --- a/net/minecraft/world/entity/LivingEntity.java
 +++ b/net/minecraft/world/entity/LivingEntity.java
-@@ -264,7 +264,7 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
+@@ -279,7 +_,7 @@
      private BlockPos lastPos;
      private Optional<BlockPos> lastClimbablePos = Optional.empty();
      private @Nullable DamageSource lastDamageSource;
@@ -17,7 +9,7 @@ index 358ff4330102a058c86d8209374d8cb9dd18b6ad..2723fcc670504a25bc0402d1842ac23e
      protected int autoSpinAttackTicks;
      protected float autoSpinAttackDmg;
      protected @Nullable ItemStack autoSpinAttackItemStack;
-@@ -292,6 +292,26 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
+@@ -306,6 +_,26 @@
      public net.kyori.adventure.util.TriState frictionState = net.kyori.adventure.util.TriState.NOT_SET; // Paper - Friction API
      public int invulnerableDuration = LivingEntity.INVULNERABLE_DURATION; // Paper - configurable invulnerable duration
      // CraftBukkit end
@@ -44,7 +36,7 @@ index 358ff4330102a058c86d8209374d8cb9dd18b6ad..2723fcc670504a25bc0402d1842ac23e
  
      protected LivingEntity(final EntityType<? extends LivingEntity> type, final Level level) {
          super(type, level);
-@@ -486,7 +506,7 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
+@@ -505,7 +_,7 @@
  
          if (this.isDeadOrDying() && this.level().shouldTickDeath(this)) {
              this.tickDeath();
@@ -53,7 +45,7 @@ index 358ff4330102a058c86d8209374d8cb9dd18b6ad..2723fcc670504a25bc0402d1842ac23e
  
          if (this.lastHurtByPlayerMemoryTime > 0) {
              this.lastHurtByPlayerMemoryTime--;
-@@ -577,11 +597,13 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
+@@ -600,11 +_,13 @@
          return true;
      }
  
@@ -69,16 +61,16 @@ index 358ff4330102a058c86d8209374d8cb9dd18b6ad..2723fcc670504a25bc0402d1842ac23e
          }
      }
  
-@@ -882,7 +904,7 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
+@@ -904,7 +_,7 @@
          // CraftBukkit end
          this.setHealth(input.getFloatOr("Health", this.getMaxHealth()));
          this.hurtTime = input.getShortOr("HurtTime", (short)0);
 -        this.deathTime = input.getShortOr("DeathTime", (short)0);
 +        this.deathTime = input.getShortOr("DeathTime", (short)0); this.broadcastedDeath = false; // Folia - region threading
-         this.lastHurtByMobTimestamp = input.getIntOr("HurtByTimestamp", 0);
          input.getString("Team").ifPresent(teamName -> {
              Scoreboard scoreboard = this.level().getScoreboard();
-@@ -1161,6 +1183,7 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
+             PlayerTeam team = scoreboard.getPlayerTeam(teamName);
+@@ -1182,6 +_,7 @@
      public boolean addEffect(final MobEffectInstance newEffect, final @Nullable Entity source, final EntityPotionEffectEvent.Cause cause, final boolean fireEvent) {
          // Paper end - Don't fire sync event during generation
          // org.spigotmc.AsyncCatcher.catchOp("effect add"); // Spigot // Paper - move to API
@@ -86,7 +78,7 @@ index 358ff4330102a058c86d8209374d8cb9dd18b6ad..2723fcc670504a25bc0402d1842ac23e
          if (this.isTickingEffects) {
              this.effectsToProcess.add(new ProcessableEffect(newEffect, cause));
              return true;
-@@ -1560,7 +1583,7 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
+@@ -1556,7 +_,7 @@
          boolean success = !blocked; // CraftBukkit - Ensure to return false if damage is blocked
          if (success) {
              this.lastDamageSource = source;
@@ -95,7 +87,7 @@ index 358ff4330102a058c86d8209374d8cb9dd18b6ad..2723fcc670504a25bc0402d1842ac23e
  
              for (MobEffectInstance effect : this.getActiveEffects()) {
                  effect.onMobHurt(level, this, source, damage);
-@@ -1787,7 +1810,7 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
+@@ -1810,7 +_,7 @@
      }
  
      public @Nullable DamageSource getLastDamageSource() {
@@ -104,7 +96,7 @@ index 358ff4330102a058c86d8209374d8cb9dd18b6ad..2723fcc670504a25bc0402d1842ac23e
              this.lastDamageSource = null;
          }
  
-@@ -2603,10 +2626,10 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
+@@ -2598,10 +_,10 @@
      }
  
      public @Nullable LivingEntity getKillCredit() {
@@ -117,7 +109,7 @@ index 358ff4330102a058c86d8209374d8cb9dd18b6ad..2723fcc670504a25bc0402d1842ac23e
          }
      }
  
-@@ -2692,7 +2715,7 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
+@@ -2687,7 +_,7 @@
          }
  
          this.lastDamageSource = source;
@@ -126,7 +118,7 @@ index 358ff4330102a058c86d8209374d8cb9dd18b6ad..2723fcc670504a25bc0402d1842ac23e
      }
  
      @Override
-@@ -3807,7 +3830,7 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
+@@ -3832,7 +_,7 @@
          this.pushEntities();
          profiler.pop();
          // Paper start - Add EntityMoveEvent
@@ -135,7 +127,7 @@ index 358ff4330102a058c86d8209374d8cb9dd18b6ad..2723fcc670504a25bc0402d1842ac23e
              if (this.xo != this.getX() || this.yo != this.getY() || this.zo != this.getZ() || this.yRotO != this.getYRot() || this.xRotO != this.getXRot()) {
                  Location from = new Location(this.level().getWorld(), this.xo, this.yo, this.zo, this.yRotO, this.xRotO);
                  Location to = new Location(this.level().getWorld(), this.getX(), this.getY(), this.getZ(), this.getYRot(), this.getXRot());
-@@ -4507,7 +4530,7 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
+@@ -4531,7 +_,7 @@
          boolean ok = false;
          BlockPos pos = BlockPos.containing(xx, y, zz);
          Level level = this.level();
@@ -144,7 +136,7 @@ index 358ff4330102a058c86d8209374d8cb9dd18b6ad..2723fcc670504a25bc0402d1842ac23e
              boolean landed = false;
  
              while (!landed && pos.getY() > level.getMinY()) {
-@@ -4669,6 +4692,11 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
+@@ -4693,6 +_,11 @@
                  this.setXRot(0.0F);
              }
          });

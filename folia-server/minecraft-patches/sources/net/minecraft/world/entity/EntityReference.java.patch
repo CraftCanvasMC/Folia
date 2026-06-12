@@ -1,14 +1,6 @@
-From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
-From: File <noreply+automated@papermc.io>
-Date: Sun, 20 Apr 1997 15:37:42 +0200
-Subject: [PATCH] folia File Patches
-
-
-diff --git a/net/minecraft/world/entity/EntityReference.java b/net/minecraft/world/entity/EntityReference.java
-index 6aef14a04986c20d2f48fb42d33cc73501770ec1..a8d90b112815a004a32f3afaa419f371e90fefb2 100644
 --- a/net/minecraft/world/entity/EntityReference.java
 +++ b/net/minecraft/world/entity/EntityReference.java
-@@ -17,22 +17,22 @@ import net.minecraft.world.level.storage.ValueOutput;
+@@ -17,22 +_,22 @@
  import org.jetbrains.annotations.Contract;
  import org.jspecify.annotations.Nullable;
  
@@ -36,7 +28,7 @@ index 6aef14a04986c20d2f48fb42d33cc73501770ec1..a8d90b112815a004a32f3afaa419f371
      }
  
      private EntityReference(final UUID uuid) {
-@@ -40,22 +40,22 @@ public final class EntityReference<StoredEntityType extends UniquelyIdentifyable
+@@ -40,22 +_,22 @@
      }
  
      @Contract("!null -> !null; null -> null")
@@ -64,7 +56,7 @@ index 6aef14a04986c20d2f48fb42d33cc73501770ec1..a8d90b112815a004a32f3afaa419f371
              if (!storedEntity.isRemoved()) {
                  return storedEntity;
              }
-@@ -67,7 +67,7 @@ public final class EntityReference<StoredEntityType extends UniquelyIdentifyable
+@@ -67,7 +_,7 @@
          if (uuid.isPresent()) {
              StoredEntityType resolved = this.resolve(lookup.lookup(uuid.get()), clazz);
              if (resolved != null && !resolved.isRemoved()) {
@@ -73,7 +65,7 @@ index 6aef14a04986c20d2f48fb42d33cc73501770ec1..a8d90b112815a004a32f3afaa419f371
                  return resolved;
              }
          }
-@@ -99,7 +99,7 @@ public final class EntityReference<StoredEntityType extends UniquelyIdentifyable
+@@ -99,7 +_,7 @@
          }
      }
  
@@ -82,13 +74,13 @@ index 6aef14a04986c20d2f48fb42d33cc73501770ec1..a8d90b112815a004a32f3afaa419f371
          final @Nullable EntityReference<StoredEntityType> reference, final Level level, final Class<StoredEntityType> clazz
      ) {
          return reference != null ? reference.getEntity(level, clazz) : null;
-@@ -117,11 +117,11 @@ public final class EntityReference<StoredEntityType extends UniquelyIdentifyable
+@@ -117,11 +_,11 @@
          return get(reference, level, Player.class);
      }
  
 -    public static <StoredEntityType extends UniquelyIdentifyable> @Nullable EntityReference<StoredEntityType> read(final ValueInput input, final String key) {
 +    public static <StoredEntityType extends Entity> @Nullable EntityReference<StoredEntityType> read(final ValueInput input, final String key) { // Folia - region threading - force Entity Type
-         return (EntityReference<StoredEntityType>) input.read(key, codec()).orElse(null);
+         return (EntityReference<StoredEntityType>)input.read(key, codec()).orElse(null);
      }
  
 -    public static <StoredEntityType extends UniquelyIdentifyable> @Nullable EntityReference<StoredEntityType> readWithOldOwnerConversion(
@@ -96,7 +88,7 @@ index 6aef14a04986c20d2f48fb42d33cc73501770ec1..a8d90b112815a004a32f3afaa419f371
          final ValueInput input, final String key, final Level level
      ) {
          Optional<UUID> uuid = input.read(key, UUIDUtil.CODEC);
-@@ -145,7 +145,7 @@ public final class EntityReference<StoredEntityType extends UniquelyIdentifyable
+@@ -145,7 +_,7 @@
  
      // Paper start - utility for reading an entity from a nullable entity reference via a UUIDLookup
      @Nullable
