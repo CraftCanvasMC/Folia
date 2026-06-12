@@ -1,14 +1,6 @@
-From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
-From: File <noreply+automated@papermc.io>
-Date: Sun, 20 Apr 1997 15:37:42 +0200
-Subject: [PATCH] folia File Patches
-
-
-diff --git a/net/minecraft/server/commands/PlaceCommand.java b/net/minecraft/server/commands/PlaceCommand.java
-index 314d476591de33820480aff0dc08a1acd6e3e5ea..db92e7c0be153984800864d5ba4c4af6e4f74b91 100644
 --- a/net/minecraft/server/commands/PlaceCommand.java
 +++ b/net/minecraft/server/commands/PlaceCommand.java
-@@ -249,18 +249,39 @@ public class PlaceCommand {
+@@ -250,18 +_,39 @@
          );
      }
  
@@ -36,6 +28,7 @@ index 314d476591de33820480aff0dc08a1acd6e3e5ea..db92e7c0be153984800864d5ba4c4af6
  
          String id = featureHolder.key().identifier().toString();
          source.sendSuccess(() -> Component.translatable("commands.place.feature.success", id, pos.getX(), pos.getY(), pos.getZ()), true);
+-        return Command.SINGLE_SUCCESS;
 +        return; // Folia - region threading
 +        // Folia start - region threading
 +                    } catch (CommandSyntaxException ex) {
@@ -43,12 +36,12 @@ index 314d476591de33820480aff0dc08a1acd6e3e5ea..db92e7c0be153984800864d5ba4c4af6
 +                    }
 +                }
 +        );
-         return 1;
++        return 1;
 +        // Folia end - region threading
      }
  
      public static int placeJigsaw(
-@@ -269,18 +290,40 @@ public class PlaceCommand {
+@@ -270,18 +_,40 @@
          ServerLevel level = source.getLevel();
          ChunkPos chunk = ChunkPos.containing(pos);
          checkLoaded(level, chunk, chunk);
@@ -64,6 +57,7 @@ index 314d476591de33820480aff0dc08a1acd6e3e5ea..db92e7c0be153984800864d5ba4c4af6
          }
  
          source.sendSuccess(() -> Component.translatable("commands.place.jigsaw.success", pos.getX(), pos.getY(), pos.getZ()), true);
+-        return Command.SINGLE_SUCCESS;
 +        return; // Folia - region threading
 +        // Folia start - region threading
 +                    } catch (CommandSyntaxException ex) {
@@ -71,7 +65,7 @@ index 314d476591de33820480aff0dc08a1acd6e3e5ea..db92e7c0be153984800864d5ba4c4af6
 +                    }
 +                }
 +        );
-         return 1;
++        return 1;
 +        // Folia end - region threading
      }
  
@@ -89,10 +83,11 @@ index 314d476591de33820480aff0dc08a1acd6e3e5ea..db92e7c0be153984800864d5ba4c4af6
          StructureStart start = structure.generate(
              structureHolder,
              level.dimension(),
-@@ -317,7 +360,15 @@ public class PlaceCommand {
+@@ -318,7 +_,15 @@
              );
          String id = structureHolder.key().identifier().toString();
          source.sendSuccess(() -> Component.translatable("commands.place.structure.success", id, pos.getX(), pos.getY(), pos.getZ()), true);
+-        return Command.SINGLE_SUCCESS;
 +        return; // Folia - region threading
 +        // Folia start - region threading
 +                    } catch (CommandSyntaxException ex) {
@@ -100,12 +95,12 @@ index 314d476591de33820480aff0dc08a1acd6e3e5ea..db92e7c0be153984800864d5ba4c4af6
 +                    }
 +                }
 +        );
-         return 1;
++        return 1;
 +        // Folia end - region threading
      }
  
      public static int placeTemplate(
-@@ -331,6 +382,13 @@ public class PlaceCommand {
+@@ -332,6 +_,13 @@
          final boolean strict
      ) throws CommandSyntaxException {
          ServerLevel level = source.getLevel();
@@ -119,10 +114,11 @@ index 314d476591de33820480aff0dc08a1acd6e3e5ea..db92e7c0be153984800864d5ba4c4af6
          StructureTemplateManager manager = level.getStructureManager();
  
          Optional<StructureTemplate> maybeStructureTemplate;
-@@ -361,7 +419,15 @@ public class PlaceCommand {
+@@ -362,7 +_,15 @@
          source.sendSuccess(
              () -> Component.translatable("commands.place.template.success", Component.translationArg(template), pos.getX(), pos.getY(), pos.getZ()), true
          );
+-        return Command.SINGLE_SUCCESS;
 +        return; // Folia - region threading
 +        // Folia start - region threading
 +                    } catch (CommandSyntaxException ex) {
@@ -130,7 +126,7 @@ index 314d476591de33820480aff0dc08a1acd6e3e5ea..db92e7c0be153984800864d5ba4c4af6
 +                    }
 +                }
 +        );
-         return 1;
++        return 1;
 +        // Folia end - region threading
      }
  

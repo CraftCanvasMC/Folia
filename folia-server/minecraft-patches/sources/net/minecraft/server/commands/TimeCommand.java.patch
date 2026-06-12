@@ -1,14 +1,6 @@
-From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
-From: File <noreply+automated@papermc.io>
-Date: Sun, 20 Apr 1997 15:37:42 +0200
-Subject: [PATCH] folia File Patches
-
-
-diff --git a/net/minecraft/server/commands/TimeCommand.java b/net/minecraft/server/commands/TimeCommand.java
-index 08e21bdb1c87a1dfdf535713a2fb742859681754..c9a42bc85a717297ead6db0db7d14cb6e39bcdcf 100644
 --- a/net/minecraft/server/commands/TimeCommand.java
 +++ b/net/minecraft/server/commands/TimeCommand.java
-@@ -115,6 +115,12 @@ public class TimeCommand {
+@@ -116,6 +_,12 @@
              );
      }
  
@@ -21,7 +13,7 @@ index 08e21bdb1c87a1dfdf535713a2fb742859681754..c9a42bc85a717297ead6db0db7d14cb6
      private static CompletableFuture<Suggestions> suggestTimeMarkers(
          final CommandSourceStack source, final SuggestionsBuilder builder, final Holder<WorldClock> clock
      ) {
-@@ -142,9 +148,11 @@ public class TimeCommand {
+@@ -143,9 +_,11 @@
  
      private static int queryTime(final CommandSourceStack source, final Holder<WorldClock> clock) {
          ServerClockManager clockManager = source.getLevel().clockManager(); // Paper - per-world time
@@ -34,7 +26,7 @@ index 08e21bdb1c87a1dfdf535713a2fb742859681754..c9a42bc85a717297ead6db0db7d14cb6
      }
  
      private static int queryTimelineTicks(final CommandSourceStack source, final Holder<WorldClock> clock, final Holder<Timeline> timeline) throws CommandSyntaxException {
-@@ -153,9 +161,11 @@ public class TimeCommand {
+@@ -154,9 +_,11 @@
          }
  
          ServerClockManager clockManager = source.getLevel().clockManager(); // Paper - per-world time
@@ -47,7 +39,7 @@ index 08e21bdb1c87a1dfdf535713a2fb742859681754..c9a42bc85a717297ead6db0db7d14cb6
      }
  
      private static int queryTimelineRepetitions(final CommandSourceStack source, final Holder<WorldClock> clock, final Holder<Timeline> timeline) throws CommandSyntaxException {
-@@ -164,14 +174,17 @@ public class TimeCommand {
+@@ -165,14 +_,17 @@
          }
  
          ServerClockManager clockManager = source.getLevel().clockManager(); // Paper - per-world time
@@ -66,7 +58,7 @@ index 08e21bdb1c87a1dfdf535713a2fb742859681754..c9a42bc85a717297ead6db0db7d14cb6
          long currentTotalTicks = clockManager.getTotalTicks(clock);
          org.bukkit.event.world.ClockTimeSkipEvent event = org.bukkit.craftbukkit.event.CraftEventFactory.createTimeSkipEvent(source, totalTicks - currentTotalTicks);
          final long newTotalTicks;
-@@ -182,21 +195,28 @@ public class TimeCommand {
+@@ -183,21 +_,28 @@
              newTotalTicks = totalTicks; // just pass it through
          }
          source.sendSuccess(() -> Component.translatable("commands.time.set.absolute", clock.getRegisteredName(), newTotalTicks), true);
@@ -97,7 +89,7 @@ index 08e21bdb1c87a1dfdf535713a2fb742859681754..c9a42bc85a717297ead6db0db7d14cb6
          // Paper start - per-world time
          ServerClockManager clockManager = source.getLevel().clockManager();
          java.util.OptionalLong targetTime = clockManager.getTotalTicksToTimeMarker(clock, timeMarkerId);
-@@ -213,18 +233,29 @@ public class TimeCommand {
+@@ -214,19 +_,30 @@
          }
          // Paper end - per-world time
          source.sendSuccess(() -> Component.translatable("commands.time.set.time_marker", clock.getRegisteredName(), timeMarkerId.identifier().toString()), true);
@@ -116,15 +108,18 @@ index 08e21bdb1c87a1dfdf535713a2fb742859681754..c9a42bc85a717297ead6db0db7d14cb6
 +        io.papermc.paper.threadedregions.RegionizedServer.getInstance().addTask(() -> { // Folia - region threading
          source.getLevel().clockManager().setPaused(clock, paused); // Paper - per-world time
          source.sendSuccess(() -> Component.translatable(paused ? "commands.time.pause" : "commands.time.resume", clock.getRegisteredName()), true);
+-        return Command.SINGLE_SUCCESS;
 +        }); // Folia - region threading
-         return 1;
++        return 1;
      }
  
      private static int setRate(final CommandSourceStack source, final Holder<WorldClock> clock, final float rate) {
 +        io.papermc.paper.threadedregions.RegionizedServer.getInstance().addTask(() -> { // Folia - region threading
          source.getLevel().clockManager().setRate(clock, rate); // Paper - per-world time
          source.sendSuccess(() -> Component.translatable("commands.time.rate", clock.getRegisteredName(), rate), true);
+-        return Command.SINGLE_SUCCESS;
 +        }); // Folia - region threading
-         return 1;
++        return 1;
      }
  
+     private static int wrapTime(final long ticks) {

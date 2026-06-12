@@ -1,14 +1,6 @@
-From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
-From: File <noreply+automated@papermc.io>
-Date: Sun, 20 Apr 1997 15:37:42 +0200
-Subject: [PATCH] folia File Patches
-
-
-diff --git a/net/minecraft/server/commands/DamageCommand.java b/net/minecraft/server/commands/DamageCommand.java
-index 3a9c854894dc1bd6eebc2bf031e38565d608a275..014269a9d39791312c0aeb94e697863dd4ae7e64 100644
 --- a/net/minecraft/server/commands/DamageCommand.java
 +++ b/net/minecraft/server/commands/DamageCommand.java
-@@ -102,12 +102,29 @@ public class DamageCommand {
+@@ -103,12 +_,29 @@
          );
      }
  
@@ -21,7 +13,7 @@ index 3a9c854894dc1bd6eebc2bf031e38565d608a275..014269a9d39791312c0aeb94e697863d
      private static int damage(final CommandSourceStack stack, final Entity target, final float amount, final DamageSource source) throws CommandSyntaxException {
 -        if (target.hurtServer(stack.getLevel(), source, amount)) {
 -            stack.sendSuccess(() -> Component.translatable("commands.damage.success", amount, target.getDisplayName()), true);
--            return 1;
+-            return Command.SINGLE_SUCCESS;
 +        // Folia start - region threading
 +        target.getBukkitEntity().taskScheduler.scheduleOrExecute((Entity newTarget) -> {
 +            try {
