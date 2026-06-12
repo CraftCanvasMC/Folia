@@ -1,14 +1,6 @@
-From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
-From: File <noreply+automated@papermc.io>
-Date: Sun, 20 Apr 1997 15:37:42 +0200
-Subject: [PATCH] folia File Patches
-
-
-diff --git a/net/minecraft/server/level/ChunkMap.java b/net/minecraft/server/level/ChunkMap.java
-index 42ec67c53c35189838ce4767c2be620e05108159..a60fe0bef6d92bf480510188779d7f9a082abb82 100644
 --- a/net/minecraft/server/level/ChunkMap.java
 +++ b/net/minecraft/server/level/ChunkMap.java
-@@ -138,8 +138,8 @@ public class ChunkMap extends SimpleRegionStorage implements ChunkHolder.PlayerP
+@@ -138,8 +_,8 @@
      private final ChunkStatusUpdateListener chunkStatusListener;
      public final ChunkMap.DistanceManager distanceManager;
      private final String storageName;
@@ -19,7 +11,7 @@ index 42ec67c53c35189838ce4767c2be620e05108159..a60fe0bef6d92bf480510188779d7f9a
      private final Long2ByteMap chunkTypeCache = new Long2ByteOpenHashMap();
      // Paper - rewrite chunk system
      public int serverViewDistance;
-@@ -704,7 +704,7 @@ public class ChunkMap extends SimpleRegionStorage implements ChunkHolder.PlayerP
+@@ -704,7 +_,7 @@
      // Paper start - optimise chunk tick iteration
      private boolean isChunkNearPlayer(final ChunkMap chunkMap, final ChunkPos chunkPos, final LevelChunk levelChunk) {
          final ca.spottedleaf.moonrise.patches.chunk_system.level.chunk.ChunkData chunkData = ((ca.spottedleaf.moonrise.patches.chunk_system.level.chunk.ChunkSystemLevelChunk)levelChunk).moonrise$getChunkHolder().holderData;
@@ -28,17 +20,17 @@ index 42ec67c53c35189838ce4767c2be620e05108159..a60fe0bef6d92bf480510188779d7f9a
          if (nearbyPlayers == null) {
              return false;
          }
-@@ -740,7 +740,7 @@ public class ChunkMap extends SimpleRegionStorage implements ChunkHolder.PlayerP
+@@ -740,7 +_,7 @@
  
-     void collectSpawningChunks(final List<LevelChunk> output) {
+     public void collectSpawningChunks(final List<LevelChunk> output) {
          // Paper start - optimise chunk tick iteration
 -        final ca.spottedleaf.moonrise.common.list.ReferenceList<net.minecraft.world.level.chunk.LevelChunk> tickingChunks = ((ca.spottedleaf.moonrise.patches.chunk_tick_iteration.ChunkTickServerLevel)this.level).moonrise$getPlayerTickingChunks();
 +        final ca.spottedleaf.moonrise.common.list.ReferenceList<net.minecraft.world.level.chunk.LevelChunk> tickingChunks = this.level.getCurrentWorldData().getEntityTickingChunks(); // Folia - region threading
  
          final LevelChunk[] raw = tickingChunks.getRawDataUnchecked();
          final int size = tickingChunks.size();
-@@ -784,7 +784,7 @@ public class ChunkMap extends SimpleRegionStorage implements ChunkHolder.PlayerP
-     boolean anyPlayerCloseEnoughTo(final BlockPos pos, final int maxDistance) {
+@@ -784,7 +_,7 @@
+     public boolean anyPlayerCloseEnoughTo(final BlockPos pos, final int maxDistance) {
          Vec3 target = new Vec3(pos);
  
 -        for (ServerPlayer player : this.playerMap.getAllPlayers()) {
@@ -46,9 +38,9 @@ index 42ec67c53c35189838ce4767c2be620e05108159..a60fe0bef6d92bf480510188779d7f9a
              if (this.playerIsCloseEnoughTo(player, target, maxDistance)) {
                  return true;
              }
-@@ -896,12 +896,12 @@ public class ChunkMap extends SimpleRegionStorage implements ChunkHolder.PlayerP
+@@ -896,12 +_,12 @@
  
-     void updatePlayerStatus(final ServerPlayer player, final boolean added) {
+     private void updatePlayerStatus(final ServerPlayer player, final boolean added) {
          boolean ignored = this.skipPlayer(player);
 -        boolean wasIgnored = this.playerMap.ignoredOrUnknown(player);
 +        //boolean wasIgnored = this.playerMap.ignoredOrUnknown(player); // Folia - region threading
@@ -62,7 +54,7 @@ index 42ec67c53c35189838ce4767c2be620e05108159..a60fe0bef6d92bf480510188779d7f9a
                  ((ca.spottedleaf.moonrise.patches.chunk_tick_iteration.ChunkTickDistanceManager)this.distanceManager).moonrise$addPlayer(player, SectionPos.of(player)); // Paper - chunk tick iteration optimisation
              }
  
-@@ -909,9 +909,9 @@ public class ChunkMap extends SimpleRegionStorage implements ChunkHolder.PlayerP
+@@ -909,9 +_,9 @@
              ca.spottedleaf.moonrise.common.PlatformHooks.get().addPlayerToDistanceMaps(this.level, player); // Paper - rewrite chunk system
          } else {
              SectionPos lastPos = player.getLastSectionPos();
@@ -75,7 +67,7 @@ index 42ec67c53c35189838ce4767c2be620e05108159..a60fe0bef6d92bf480510188779d7f9a
                  ((ca.spottedleaf.moonrise.patches.chunk_tick_iteration.ChunkTickDistanceManager)this.distanceManager).moonrise$removePlayer(player, SectionPos.of(player)); // Paper - chunk tick iteration optimisation
              }
  
-@@ -929,27 +929,13 @@ public class ChunkMap extends SimpleRegionStorage implements ChunkHolder.PlayerP
+@@ -929,27 +_,13 @@
  
          SectionPos oldSection = player.getLastSectionPos();
          SectionPos newSection = SectionPos.of(player);
@@ -108,7 +100,7 @@ index 42ec67c53c35189838ce4767c2be620e05108159..a60fe0bef6d92bf480510188779d7f9a
  
              // Paper - rewrite chunk system
          }
-@@ -979,9 +965,9 @@ public class ChunkMap extends SimpleRegionStorage implements ChunkHolder.PlayerP
+@@ -983,9 +_,9 @@
      public void addEntity(final Entity entity) {
          org.spigotmc.AsyncCatcher.catchOp("entity track"); // Spigot
          // Paper start - ignore and warn about illegal addEntity calls instead of crashing server
@@ -120,7 +112,7 @@ index 42ec67c53c35189838ce4767c2be620e05108159..a60fe0bef6d92bf480510188779d7f9a
              return;
          }
          // Paper end - ignore and warn about illegal addEntity calls instead of crashing server
-@@ -992,23 +978,29 @@ public class ChunkMap extends SimpleRegionStorage implements ChunkHolder.PlayerP
+@@ -996,23 +_,29 @@
              range = org.spigotmc.TrackingRange.getEntityTrackingRange(entity, range); // Spigot
              if (range != 0) {
                  int updateInterval = type.updateInterval();
@@ -154,7 +146,7 @@ index 42ec67c53c35189838ce4767c2be620e05108159..a60fe0bef6d92bf480510188779d7f9a
                          if (e.entity != player) {
                              e.updatePlayer(player);
                          }
-@@ -1023,12 +1015,19 @@ public class ChunkMap extends SimpleRegionStorage implements ChunkHolder.PlayerP
+@@ -1027,12 +_,19 @@
          if (entity instanceof ServerPlayer player) {
              this.updatePlayerStatus(player, false);
  
@@ -176,7 +168,7 @@ index 42ec67c53c35189838ce4767c2be620e05108159..a60fe0bef6d92bf480510188779d7f9a
          if (trackedEntity != null) {
              trackedEntity.broadcastRemoved();
          }
-@@ -1037,9 +1036,11 @@ public class ChunkMap extends SimpleRegionStorage implements ChunkHolder.PlayerP
+@@ -1041,9 +_,11 @@
  
      // Paper start - optimise entity tracker
      private void newTrackerTick() {
@@ -189,7 +181,7 @@ index 42ec67c53c35189838ce4767c2be620e05108159..a60fe0bef6d92bf480510188779d7f9a
          final Entity[] trackerEntitiesRaw = trackerEntities.getRawDataUnchecked();
          for (int i = 0, len = trackerEntities.size(); i < len; ++i) {
              final Entity entity = trackerEntitiesRaw[i];
-@@ -1047,7 +1048,7 @@ public class ChunkMap extends SimpleRegionStorage implements ChunkHolder.PlayerP
+@@ -1051,7 +_,7 @@
              if (tracker == null) {
                  continue;
              }
@@ -198,7 +190,7 @@ index 42ec67c53c35189838ce4767c2be620e05108159..a60fe0bef6d92bf480510188779d7f9a
              if (((ca.spottedleaf.moonrise.patches.entity_tracker.EntityTrackerTrackedEntity)tracker).moonrise$hasPlayers()
                  || ((ca.spottedleaf.moonrise.patches.chunk_system.entity.ChunkSystemEntity)entity).moonrise$getChunkStatus().isOrAfter(FullChunkStatus.ENTITY_TICKING)) {
                  tracker.serverEntity.sendChanges();
-@@ -1065,37 +1066,11 @@ public class ChunkMap extends SimpleRegionStorage implements ChunkHolder.PlayerP
+@@ -1069,36 +_,11 @@
          // Paper end - optimise entity tracker
          // Paper - rewrite chunk system
  
@@ -211,9 +203,8 @@ index 42ec67c53c35189838ce4767c2be620e05108159..a60fe0bef6d92bf480510188779d7f9a
 -            boolean sectionPosChanged = !Objects.equals(oldPos, newPos);
 -            if (sectionPosChanged) {
 -                trackedEntity.updatePlayers(players);
--                Entity entity = trackedEntity.entity;
--                if (entity instanceof ServerPlayer) {
--                    movedPlayers.add((ServerPlayer)entity);
+-                if (trackedEntity.entity instanceof ServerPlayer serverPlayer) {
+-                    movedPlayers.add(serverPlayer);
 -                }
 -
 -                trackedEntity.lastSectionPos = newPos;
@@ -238,7 +229,7 @@ index 42ec67c53c35189838ce4767c2be620e05108159..a60fe0bef6d92bf480510188779d7f9a
          if (trackedEntity != null) {
              trackedEntity.sendToTrackingPlayers(packet);
          }
-@@ -1104,30 +1079,26 @@ public class ChunkMap extends SimpleRegionStorage implements ChunkHolder.PlayerP
+@@ -1107,30 +_,26 @@
      public void sendToTrackingPlayersFiltered(
          final Entity entity, final Packet<? super ClientGamePacketListener> packet, final Predicate<ServerPlayer> targetPredicate
      ) {
@@ -273,7 +264,7 @@ index 42ec67c53c35189838ce4767c2be620e05108159..a60fe0bef6d92bf480510188779d7f9a
      }
  
      public void resendBiomesForChunks(final List<ChunkAccess> chunks) {
-@@ -1375,8 +1346,13 @@ public class ChunkMap extends SimpleRegionStorage implements ChunkHolder.PlayerP
+@@ -1378,8 +_,13 @@
                      && this.entity.broadcastToPlayer(player)
                      && ChunkMap.this.isChunkTracked(player, this.entity.chunkPosition().x(), this.entity.chunkPosition().z());
                  // Paper end - Configurable entity tracking range by Y

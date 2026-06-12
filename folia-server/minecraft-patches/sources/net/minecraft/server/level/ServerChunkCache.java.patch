@@ -1,14 +1,6 @@
-From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
-From: File <noreply+automated@papermc.io>
-Date: Sun, 20 Apr 1997 15:37:42 +0200
-Subject: [PATCH] folia File Patches
-
-
-diff --git a/net/minecraft/server/level/ServerChunkCache.java b/net/minecraft/server/level/ServerChunkCache.java
-index 396ab3cdcf6f726ce7133395bb39594ef4b1c011..044b351b1ea64f02077624c52e0044ccef1c84c3 100644
 --- a/net/minecraft/server/level/ServerChunkCache.java
 +++ b/net/minecraft/server/level/ServerChunkCache.java
-@@ -64,17 +64,14 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+@@ -64,17 +_,14 @@
      public final ChunkMap chunkMap;
      private final SavedDataStorage savedDataStorage;
      private final TicketStorage ticketStorage;
@@ -28,7 +20,7 @@ index 396ab3cdcf6f726ce7133395bb39594ef4b1c011..044b351b1ea64f02077624c52e0044cc
      // Paper start
      public final ca.spottedleaf.concurrentutil.map.concurrent.longs.ConcurrentChainedLong2ReferenceHashTable<net.minecraft.world.level.chunk.LevelChunk> fullChunks = new ca.spottedleaf.concurrentutil.map.concurrent.longs.ConcurrentChainedLong2ReferenceHashTable<>();
      public int getFullChunksCount() {
-@@ -100,6 +97,11 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+@@ -100,6 +_,11 @@
      }
  
      private ChunkAccess syncLoad(final int chunkX, final int chunkZ, final ChunkStatus toStatus) {
@@ -40,7 +32,7 @@ index 396ab3cdcf6f726ce7133395bb39594ef4b1c011..044b351b1ea64f02077624c52e0044cc
          final ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkTaskScheduler chunkTaskScheduler = ((ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemServerLevel)this.level).moonrise$getChunkTaskScheduler();
          final CompletableFuture<ChunkAccess> completable = new CompletableFuture<>();
          chunkTaskScheduler.scheduleChunkLoad(
-@@ -161,7 +163,7 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+@@ -161,7 +_,7 @@
  
          // TODO check on update: impl of forEachBlockTickingChunk will only iterate ENTITY ticking chunks!
          // TODO check on update: consumer just runs tickChunk
@@ -49,7 +41,7 @@ index 396ab3cdcf6f726ce7133395bb39594ef4b1c011..044b351b1ea64f02077624c52e0044cc
  
          // note: we can use the backing array here because:
          // 1. we do not care about new additions
-@@ -349,6 +351,7 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+@@ -349,6 +_,7 @@
      }
  
      public CompletableFuture<ChunkResult<ChunkAccess>> getChunkFuture(final int x, final int z, final ChunkStatus targetStatus, final boolean loadOrGenerate) {
@@ -57,7 +49,7 @@ index 396ab3cdcf6f726ce7133395bb39594ef4b1c011..044b351b1ea64f02077624c52e0044cc
          boolean isMainThread = Thread.currentThread() == this.mainThread;
          CompletableFuture<ChunkResult<ChunkAccess>> serverFuture;
          if (isMainThread) {
-@@ -501,9 +504,10 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+@@ -501,9 +_,10 @@
      }
  
      private void tickChunks() {
@@ -71,7 +63,7 @@ index 396ab3cdcf6f726ce7133395bb39594ef4b1c011..044b351b1ea64f02077624c52e0044cc
          if (!this.level.isDebug()) {
              ProfilerFiller profiler = Profiler.get();
              profiler.push("pollingChunks");
-@@ -519,27 +523,29 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+@@ -519,27 +_,29 @@
      }
  
      private void broadcastChangedChunks(final ProfilerFiller profiler) {
@@ -104,7 +96,7 @@ index 396ab3cdcf6f726ce7133395bb39594ef4b1c011..044b351b1ea64f02077624c52e0044cc
                  // Paper start - per player mob spawning backoff
                  for (int j = 0; j < ServerPlayer.MOBCATEGORY_TOTAL_ENUMS; j++) {
                      player.mobCounts[j] = 0;
-@@ -552,31 +558,31 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+@@ -552,31 +_,31 @@
                  }
                  // Paper end - per player mob spawning backoff
              }
@@ -133,7 +125,7 @@ index 396ab3cdcf6f726ce7133395bb39594ef4b1c011..044b351b1ea64f02077624c52e0044cc
              // Paper end - PlayerNaturallySpawnCreaturesEvent
 -            boolean spawnPersistent = this.level.ticksPerSpawnCategory.getLong(org.bukkit.entity.SpawnCategory.ANIMAL) != 0L && this.level.getGameTime() % this.level.ticksPerSpawnCategory.getLong(org.bukkit.entity.SpawnCategory.ANIMAL) == 0L; // CraftBukkit
 +            boolean spawnPersistent = this.level.ticksPerSpawnCategory.getLong(org.bukkit.entity.SpawnCategory.ANIMAL) != 0L && this.level.getRedstoneGameTime() % this.level.ticksPerSpawnCategory.getLong(org.bukkit.entity.SpawnCategory.ANIMAL) == 0L; // CraftBukkit // Folia - region threading
-             spawningCategories = NaturalSpawner.getFilteredSpawningCategories(spawnCookie, this.spawnFriendlies, this.spawnEnemies, spawnPersistent, this.level); // CraftBukkit
+             spawningCategories = NaturalSpawner.getFilteredSpawningCategories(spawnCookie, this.spawnFriendlies, this.spawnEnemies, spawnPersistent, this.level); // CraftBukkit // todo snapshot - method lost its spawnFriendlies parameter as mojang is moving away further. We can do what we did prior and reintroduce or re-evaluate. // re-added it for now but let's still re-evaluate later
          } else {
              spawningCategories = List.of();
          }
@@ -143,7 +135,7 @@ index 396ab3cdcf6f726ce7133395bb39594ef4b1c011..044b351b1ea64f02077624c52e0044cc
  
          try {
              profiler.popPush("filteringSpawningChunks");
-@@ -663,18 +669,23 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+@@ -663,18 +_,23 @@
          int zc = SectionPos.blockToSectionCoord(pos.getZ());
          ChunkHolder chunk = this.getVisibleChunkIfPresent(ChunkPos.pack(xc, zc));
          if (chunk != null && chunk.blockChanged(pos)) {
@@ -171,7 +163,7 @@ index 396ab3cdcf6f726ce7133395bb39594ef4b1c011..044b351b1ea64f02077624c52e0044cc
      }
  
      public boolean hasActiveTickets() {
-@@ -779,7 +790,8 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+@@ -783,7 +_,8 @@
  
      @VisibleForDebug
      public NaturalSpawner.@Nullable SpawnState getLastSpawnState() {
@@ -181,7 +173,7 @@ index 396ab3cdcf6f726ce7133395bb39594ef4b1c011..044b351b1ea64f02077624c52e0044cc
      }
  
      public void deactivateTicketsOnClosing() {
-@@ -788,7 +800,7 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+@@ -792,7 +_,7 @@
  
      public void onChunkReadyToSend(final ChunkHolder chunk) {
          if (chunk.hasChangesToBroadcast()) {
@@ -190,7 +182,7 @@ index 396ab3cdcf6f726ce7133395bb39594ef4b1c011..044b351b1ea64f02077624c52e0044cc
          }
      }
  
-@@ -817,20 +829,76 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+@@ -821,20 +_,76 @@
              return ServerChunkCache.this.mainThread;
          }
  
