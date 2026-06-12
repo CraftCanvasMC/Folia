@@ -1,0 +1,70 @@
+--- a/net/minecraft/world/entity/Mob.java
++++ b/net/minecraft/world/entity/Mob.java
+@@ -252,8 +_,20 @@
+         return this.sensing;
+     }
+ 
++    // Folia start - region threading
++    public LivingEntity getTargetRaw() {
++        return this.target;
++    }
++    // Folia end - region threading
++
+     @Override
+     public @Nullable LivingEntity getTarget() {
++        // Folia start - region threading
++        if (this.target != null && (!ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(this.target) || this.target.isRemoved())) {
++            this.target = null;
++            return null;
++        }
++        // Folia end - region threading
+         return this.asValidTarget(this.target);
+     }
+ 
+@@ -262,6 +_,11 @@
+     }
+ 
+     protected @Nullable LivingEntity asValidTarget(final @Nullable LivingEntity target) {
++        // Folia start - region threading
++        if (target != null && (!ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(target) || target.isRemoved())) {
++            return null;
++        }
++        // Folia end - region threading
+         if (target instanceof Player player && (player.isCreative() || player.isSpectator())) {
+             return null;
+         } else {
+@@ -1656,6 +_,20 @@
+         }
+     }
+ 
++    // Folia start - moved from removeAfterChangingDimensions()
++    @Override
++    protected void postRemoveAfterChangingDimensions() {
++        super.postRemoveAfterChangingDimensions();
++
++        for (EquipmentSlot slot : EquipmentSlot.VALUES) {
++            ItemStack itemStack = this.getItemBySlot(slot);
++            if (!itemStack.isEmpty()) {
++                itemStack.setCount(0);
++            }
++        }
++    }
++    // Folia end - moved from removeAfterChangingDimensions()
++
+     @VisibleForTesting
+     public void removeFreeWill() {
+         this.removeAllGoals(goal -> true);
+@@ -1676,12 +_,7 @@
+     protected void removeAfterChangingDimensions() {
+         super.removeAfterChangingDimensions();
+ 
+-        for (EquipmentSlot slot : EquipmentSlot.VALUES) {
+-            ItemStack itemStack = this.getItemBySlot(slot);
+-            if (!itemStack.isEmpty()) {
+-                itemStack.setCount(0);
+-            }
+-        }
++        // Folia - move to postRemoveAfterChangingDimensions()
+     }
+ 
+     @Override

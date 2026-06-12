@@ -1,0 +1,60 @@
+--- a/net/minecraft/server/waypoints/ServerWaypointManager.java
++++ b/net/minecraft/server/waypoints/ServerWaypointManager.java
+@@ -29,12 +_,7 @@
+ 
+     @Override
+     public void trackWaypoint(final WaypointTransmitter waypoint) {
+-        this.waypoints.add(waypoint);
+-
+-        if (!this.locatorBarEnabled) return; // Paper - optimize ServerWaypointManager with locator bar disabled
+-        for (ServerPlayer player : this.players) {
+-            this.createConnection(player, waypoint);
+-        }
++        // Folia - region threading
+     }
+ 
+     @Override
+@@ -62,40 +_,15 @@
+     }
+ 
+     public void addPlayer(final ServerPlayer player) {
+-        this.players.add(player);
+-
+-        if (this.locatorBarEnabled) { // Paper - optimize ServerWaypointManager with locator bar disabled
+-        for (WaypointTransmitter waypoint : this.waypoints) {
+-            this.createConnection(player, waypoint);
+-        }
+-        } // Paper - optimize ServerWaypointManager with locator bar disabled
+-
+-        if (player.isTransmittingWaypoint()) {
+-            this.trackWaypoint(player);
+-        }
++        // Folia - region threading
+     }
+ 
+     public void updatePlayer(final ServerPlayer player) {
+-        if (!this.locatorBarEnabled) return; // Paper - optimize ServerWaypointManager with locator bar disabled
+-        Map<WaypointTransmitter, WaypointTransmitter.Connection> waypointConnections = this.connections.row(player);
+-        SetView<WaypointTransmitter> potentialWaypoints = Sets.difference(this.waypoints, waypointConnections.keySet());
+-
+-        for (Entry<WaypointTransmitter, WaypointTransmitter.Connection> waypointConnection : ImmutableSet.copyOf(waypointConnections.entrySet())) {
+-            this.updateConnection(player, waypointConnection.getKey(), waypointConnection.getValue());
+-        }
+-
+-        for (WaypointTransmitter waypoint : potentialWaypoints) {
+-            this.createConnection(player, waypoint);
+-        }
++        // Folia - region threading
+     }
+ 
+     public void removePlayer(final ServerPlayer player) {
+-        this.connections.row(player).values().removeIf(connection -> {
+-            connection.disconnect();
+-            return true;
+-        });
+-        this.untrackWaypoint(player);
+-        this.players.remove(player);
++        // Folia - region threading
+     }
+ 
+     public void breakAllConnections() {

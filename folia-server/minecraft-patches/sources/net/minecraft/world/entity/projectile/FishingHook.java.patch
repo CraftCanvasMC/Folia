@@ -1,0 +1,33 @@
+--- a/net/minecraft/world/entity/projectile/FishingHook.java
++++ b/net/minecraft/world/entity/projectile/FishingHook.java
+@@ -271,6 +_,11 @@
+     }
+ 
+     private boolean shouldStopFishing(final Player owner) {
++        // Folia start - region threading
++        if (!ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(owner)) {
++            return true;
++        }
++        // Folia end - region threading
+         if (owner.canInteractWithLevel()) {
+             ItemStack selectedItem = owner.getMainHandItem();
+             ItemStack selectedItemOffHand = owner.getOffhandItem();
+@@ -606,9 +_,17 @@
+ 
+     @Override
+     public void remove(final Entity.RemovalReason reason, final org.bukkit.event.entity.EntityRemoveEvent.@Nullable Cause cause) { // CraftBukkit - add Bukkit remove cause
+-        this.updateOwnerInfo(null);
++        //this.updateOwnerInfo(null); // Folia - region threading - move into preRemove
+         super.remove(reason, cause); // CraftBukkit - add Bukkit remove cause
+     }
++
++    // Folia start - region threading
++    @Override
++    protected void preRemove(RemovalReason reason) {
++        super.preRemove(reason);
++        this.updateOwnerInfo(null);
++    }
++    // Folia end - region threading
+ 
+     @Override
+     public void onClientRemoval() {

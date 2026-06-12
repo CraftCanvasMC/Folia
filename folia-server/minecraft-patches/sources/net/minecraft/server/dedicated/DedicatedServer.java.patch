@@ -1,0 +1,59 @@
+--- a/net/minecraft/server/dedicated/DedicatedServer.java
++++ b/net/minecraft/server/dedicated/DedicatedServer.java
+@@ -400,8 +_,11 @@
+     }
+ 
+     @Override
+-    protected void tickServer(final BooleanSupplier haveTime) {
+-        super.tickServer(haveTime);
++    // Folia start - region threading
++    public void tickServer(final long startTime, final long scheduledEnd, final long targetBuffer,
++                           final io.papermc.paper.threadedregions.TickRegions.TickRegionData region) {
++        super.tickServer(startTime, scheduledEnd, targetBuffer, region);
++        // Folia end - region threading
+         if (this.jsonRpcServer != null) {
+             this.jsonRpcServer.tick();
+         }
+@@ -527,7 +_,7 @@
+     @Override
+     protected void tickConnection() {
+         super.tickConnection();
+-        this.handleConsoleInputs();
++        // Folia - region threading
+     }
+ 
+     private static final java.util.concurrent.atomic.AtomicInteger ASYNC_DEBUG_CHUNKS_COUNT = new java.util.concurrent.atomic.AtomicInteger(); // Paper - rewrite chunk system
+@@ -890,7 +_,7 @@
+         if (command.isBlank()) return ""; // Paper - Do not process empty rcon commands
+ 
+         rconConsoleSource.prepareForCommand();
+-        this.executeBlocking(() -> {
++        Runnable sync = () -> { // Folia - region threading
+             CommandSourceStack wrapper = rconConsoleSource.createCommandSourceStack();
+             org.bukkit.event.server.RemoteServerCommandEvent event = new org.bukkit.event.server.RemoteServerCommandEvent(rconConsoleSource.getBukkitSender(wrapper), command);
+             this.server.getPluginManager().callEvent(event);
+@@ -898,13 +_,22 @@
+                 return;
+             }
+             this.getCommands().performPrefixedCommand(wrapper, event.getCommand());
+-        });
++        }; // Folia start - region threading
++        java.util.concurrent.CompletableFuture
++            .runAsync(sync, io.papermc.paper.threadedregions.RegionizedServer.getInstance()::addTask)
++            .whenComplete((Void r, Throwable t) -> {
++                if (t != null) {
++                    LOGGER.error("Error handling command for rcon: " + command, t);
++                }
++            })
++            .join();
++        // Folia end - region threading
+         return rconConsoleSource.getCommandResponse();
+         // CraftBukkit end
+     }
+ 
+     @Override
+-    protected void stopServer() {
++    public void stopServer() { // Folia - region threading - public
+         this.notificationManager().serverShuttingDown();
+         super.stopServer();
+         //Util.shutdownExecutors(); // Paper - Improved watchdog support; moved into super

@@ -1,0 +1,20 @@
+--- a/net/minecraft/server/commands/ClearInventoryCommands.java
++++ b/net/minecraft/server/commands/ClearInventoryCommands.java
+@@ -65,9 +_,14 @@
+         int count = 0;
+ 
+         for (ServerPlayer player : players) {
+-            count += player.getInventory().clearOrCountMatchingItems(predicate, maxCount, player.inventoryMenu.getCraftSlots());
+-            player.containerMenu.broadcastChanges();
+-            player.inventoryMenu.slotsChanged(player.getInventory());
++            // Folia start - region threading
++            ++count;
++            player.getBukkitEntity().taskScheduler.scheduleOrExecute((ServerPlayer newPlayer) -> {
++                newPlayer.getInventory().clearOrCountMatchingItems(predicate, maxCount, newPlayer.inventoryMenu.getCraftSlots());
++                newPlayer.containerMenu.broadcastChanges();
++                newPlayer.inventoryMenu.slotsChanged(newPlayer.getInventory());
++            });
++            // Folia end - region threading
+         }
+ 
+         if (count == 0) {

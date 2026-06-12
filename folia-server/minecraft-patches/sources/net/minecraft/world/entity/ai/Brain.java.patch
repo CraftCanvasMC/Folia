@@ -1,0 +1,21 @@
+--- a/net/minecraft/world/entity/ai/Brain.java
++++ b/net/minecraft/world/entity/ai/Brain.java
+@@ -400,9 +_,17 @@
+     }
+ 
+     public void stopAll(final ServerLevel level, final E body) {
++        // Folia start - region threading
++        final List<BehaviorControl<? super E>> behaviors = this.getRunningBehaviors();
++        if (behaviors.isEmpty()) {
++            // avoid calling getGameTime, as this may be called while portalling an entity - which will cause
++            // the world data retrieval to fail
++            return;
++        }
++        // Folia end - region threading
+         long timestamp = body.level().getGameTime();
+ 
+-        for (BehaviorControl<? super E> behavior : this.getRunningBehaviors()) {
++        for (BehaviorControl<? super E> behavior : behaviors) { // Folia - region threading
+             behavior.doStop(level, body, timestamp);
+         }
+     }

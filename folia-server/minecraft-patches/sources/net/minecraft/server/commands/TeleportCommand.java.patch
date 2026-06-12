@@ -1,0 +1,46 @@
+--- a/net/minecraft/server/commands/TeleportCommand.java
++++ b/net/minecraft/server/commands/TeleportCommand.java
+@@ -150,18 +_,7 @@
+ 
+     private static int teleportToEntity(final CommandSourceStack source, final Collection<? extends Entity> entities, final Entity destination) throws CommandSyntaxException {
+         for (Entity entity : entities) {
+-            performTeleport(
+-                source,
+-                entity,
+-                (ServerLevel)destination.level(),
+-                destination.getX(),
+-                destination.getY(),
+-                destination.getZ(),
+-                EnumSet.noneOf(Relative.class),
+-                destination.getYRot(),
+-                destination.getXRot(),
+-                null
+-            );
++            io.papermc.paper.threadedregions.TeleportUtils.teleport(entity, false, destination, Float.valueOf(destination.getYRot()), Float.valueOf(destination.getXRot()), Entity.TELEPORT_FLAG_LOAD_CHUNK, org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND, null); // Folia - region threading
+         }
+ 
+         if (entities.size() == 1) {
+@@ -256,6 +_,23 @@
+         float relativeOrAbsoluteXRot = relatives.contains(Relative.X_ROT) ? xRot - victim.getXRot() : xRot;
+         float newYRot = Mth.wrapDegrees(relativeOrAbsoluteYRot);
+         float newXRot = Mth.wrapDegrees(relativeOrAbsoluteXRot);
++        // Folia start - region threading
++        if (true) {
++            Vec3 posFinal = new Vec3(x, y, z);
++            Float yawFinal = Float.valueOf(newYRot);
++            Float pitchFinal = Float.valueOf(newXRot);
++            victim.getBukkitEntity().taskScheduler.schedule((Entity nmsEntity) -> {
++                nmsEntity.stopRiding();
++                nmsEntity.teleportAsync(
++                        level, posFinal, yawFinal, pitchFinal, Vec3.ZERO,
++                        org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND,
++                        Entity.TELEPORT_FLAG_LOAD_CHUNK | Entity.TELEPORT_FLAG_TELEPORT_PASSENGERS,
++                        null
++                );
++                }, null, 1L);
++            return;
++        }
++        // Folia end - region threading
+         if (victim.teleportTo(level, relativeOrAbsoluteX, relativeOrAbsoluteY, relativeOrAbsoluteZ, relatives, newYRot, newXRot, true, org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND)) { // Paper - teleport cause
+             if (lookAt != null) {
+                 lookAt.perform(source, victim);
