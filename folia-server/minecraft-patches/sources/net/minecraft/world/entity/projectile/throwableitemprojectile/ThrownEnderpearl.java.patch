@@ -56,7 +56,7 @@
 +
 +                            // endermite spawn chance
 +                            if (world.getRandom().nextFloat() < 0.05F && world.isSpawningMonsters()) {
-+                                Endermite entityendermite = (Endermite) EntityType.ENDERMITE.create(world, EntitySpawnReason.TRIGGERED);
++                                Endermite entityendermite = EntityTypes.ENDERMITE.create(world, EntitySpawnReason.TRIGGERED);
 +
 +                                if (entityendermite != null) {
 +                                    float yRot = teleported.getYRot();

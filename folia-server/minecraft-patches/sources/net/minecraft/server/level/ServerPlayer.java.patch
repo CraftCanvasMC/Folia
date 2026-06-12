@@ -48,7 +48,7 @@
 +        // try hard to find, so that we don't attempt another chunk load
 +        for (int dz = -SPAWN_RADIUS_SELECTION_SEARCH; dz <= SPAWN_RADIUS_SELECTION_SEARCH; ++dz) {
 +            for (int dx = -SPAWN_RADIUS_SELECTION_SEARCH; dx <= SPAWN_RADIUS_SELECTION_SEARCH; ++dx) {
-+                BlockPos inChunk = PlayerSpawnFinder.getOverworldRespawnPos(world, selected.getX() + dx, selected.getZ() + dz);
++                BlockPos inChunk = PlayerSpawnFinder.getLevelRespawnPos(world, selected.getX() + dx, selected.getZ() + dz);
 +                if (inChunk == null) {
 +                    continue;
 +                }
