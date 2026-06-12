@@ -1,14 +1,6 @@
-From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
-From: File <noreply+automated@papermc.io>
-Date: Sun, 20 Apr 1997 15:37:42 +0200
-Subject: [PATCH] folia File Patches
-
-
-diff --git a/net/minecraft/world/level/dimension/end/EnderDragonFight.java b/net/minecraft/world/level/dimension/end/EnderDragonFight.java
-index 6cfaf75e92d194fe4ad1d404bc12ddec5ca18b8a..91447b6fcae1bb81ee5c86f76e00ad3d1e8ae446 100644
 --- a/net/minecraft/world/level/dimension/end/EnderDragonFight.java
 +++ b/net/minecraft/world/level/dimension/end/EnderDragonFight.java
-@@ -80,7 +80,7 @@ public class EnderDragonFight extends SavedData {
+@@ -80,7 +_,7 @@
      private Predicate<Entity> validPlayer;
      public ServerBossEvent dragonEvent;
      public ServerLevel level;
@@ -17,7 +9,7 @@ index 6cfaf75e92d194fe4ad1d404bc12ddec5ca18b8a..91447b6fcae1bb81ee5c86f76e00ad3d
      public final List<Integer> gateways;
      private final BlockPattern exitPortalPattern = BlockPatternBuilder.start()
          .aisle("       ", "       ", "       ", "   #   ", "       ", "       ", "       ")
-@@ -240,6 +240,12 @@ public class EnderDragonFight extends SavedData {
+@@ -240,6 +_,12 @@
          }
  
          List<? extends EnderDragon> entities = this.level.getDragons();
@@ -30,7 +22,7 @@ index 6cfaf75e92d194fe4ad1d404bc12ddec5ca18b8a..91447b6fcae1bb81ee5c86f76e00ad3d
          if (entities.isEmpty()) {
              this.dragonKilled = true;
          } else {
-@@ -360,8 +366,14 @@ public class EnderDragonFight extends SavedData {
+@@ -360,8 +_,14 @@
  
          ChunkPos chunkOrigin = ChunkPos.containing(this.origin);
  
@@ -44,10 +36,10 @@ index 6cfaf75e92d194fe4ad1d404bc12ddec5ca18b8a..91447b6fcae1bb81ee5c86f76e00ad3d
 +        // Folia end - region threading
 +        for (int x = -8 + chunkOrigin.x(); x <= 8 + chunkOrigin.x(); x++) { // Folia - diff on change - use above for radius
 +            for (int z = 8 + chunkOrigin.z(); z <= 8 + chunkOrigin.z(); z++) { // Folia - diff on change - use above for radius
-                 ChunkAccess chunk = this.level.getChunk(x, z, ChunkStatus.FULL, false);
-                 if (!(chunk instanceof LevelChunk)) {
+                 if (!(this.level.getChunk(x, z, ChunkStatus.FULL, false) instanceof LevelChunk levelChunk)) {
                      return false;
-@@ -530,6 +542,11 @@ public class EnderDragonFight extends SavedData {
+                 }
+@@ -529,6 +_,11 @@
      }
  
      public void onCrystalDestroyed(final EndCrystal crystal, final DamageSource source) {
@@ -56,10 +48,10 @@ index 6cfaf75e92d194fe4ad1d404bc12ddec5ca18b8a..91447b6fcae1bb81ee5c86f76e00ad3d
 +            return;
 +        }
 +        // Folia end - region threading
-         if (this.respawnStage != null && this.respawnCrystals.contains(crystal)) {
+         if (this.respawnStage != null && this.respawnCrystals.stream().anyMatch(ref -> ref.matches(crystal))) {
              this.abortRespawnSequence();
          } else {
-@@ -560,7 +577,7 @@ public class EnderDragonFight extends SavedData {
+@@ -559,7 +_,7 @@
  
      public boolean tryRespawn(@Nullable final BlockPos placedEndCrystalPos) { // placedEndCrystalPos is null if the tryRespawn() call was not caused by a placed end crystal
          // Paper end - Perf: Do crystal-portal proximity check before entity lookup
