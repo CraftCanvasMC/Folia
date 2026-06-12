@@ -1,14 +1,6 @@
-From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
-From: File <noreply+automated@papermc.io>
-Date: Sun, 20 Apr 1997 15:37:42 +0200
-Subject: [PATCH] folia File Patches
-
-
-diff --git a/net/minecraft/network/Connection.java b/net/minecraft/network/Connection.java
-index 0f06d509125e72ec11d263d0d5c2179d65f6d8dd..c2bdede413d38ee5b211561f67c9897639c2e879 100644
 --- a/net/minecraft/network/Connection.java
 +++ b/net/minecraft/network/Connection.java
-@@ -64,7 +64,7 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -65,7 +_,7 @@
      private static final ProtocolInfo<ServerHandshakePacketListener> INITIAL_PROTOCOL = HandshakeProtocols.SERVERBOUND;
      private final PacketFlow receiving;
      private volatile boolean sendLoginDisconnect = true;
@@ -17,16 +9,16 @@ index 0f06d509125e72ec11d263d0d5c2179d65f6d8dd..c2bdede413d38ee5b211561f67c98976
      public Channel channel;
      public SocketAddress address;
      // Spigot start
-@@ -76,7 +76,7 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -76,7 +_,7 @@
+     private volatile @Nullable PacketListener disconnectListener;
      private volatile @Nullable PacketListener packetListener;
      private @Nullable DisconnectionDetails disconnectionDetails;
-     private boolean encrypted;
 -    private boolean disconnectionHandled;
 +    private final java.util.concurrent.atomic.AtomicBoolean disconnectionHandled = new java.util.concurrent.atomic.AtomicBoolean(false); // Folia - region threading - may be called concurrently during configuration stage
      private int receivedPackets;
      private int sentPackets;
      private float averageReceivedPackets;
-@@ -132,6 +132,41 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -133,6 +_,41 @@
          this.receiving = receiving;
      }
  
@@ -68,7 +60,7 @@ index 0f06d509125e72ec11d263d0d5c2179d65f6d8dd..c2bdede413d38ee5b211561f67c98976
      @Override
      public void channelActive(final ChannelHandlerContext ctx) throws Exception {
          super.channelActive(ctx);
-@@ -141,6 +176,7 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -142,6 +_,7 @@
          if (this.delayedDisconnect != null) {
              this.disconnect(this.delayedDisconnect);
          }
@@ -76,7 +68,7 @@ index 0f06d509125e72ec11d263d0d5c2179d65f6d8dd..c2bdede413d38ee5b211561f67c98976
      }
  
      @Override
-@@ -403,7 +439,7 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -404,7 +_,7 @@
          }
  
          packet.onPacketDispatch(this.getPlayer());
@@ -85,7 +77,7 @@ index 0f06d509125e72ec11d263d0d5c2179d65f6d8dd..c2bdede413d38ee5b211561f67c98976
              || (io.papermc.paper.util.MCUtil.isMainThread() && packet.isReady() && this.pendingActions.isEmpty()
              && (packet.getExtraPackets() == null || packet.getExtraPackets().isEmpty())))) {
              this.sendPacket(packet, listener, flush);
-@@ -432,11 +468,12 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -433,11 +_,12 @@
      }
  
      public void runOnceConnected(final Consumer<Connection> action) {
@@ -99,7 +91,7 @@ index 0f06d509125e72ec11d263d0d5c2179d65f6d8dd..c2bdede413d38ee5b211561f67c98976
          }
      }
  
-@@ -482,10 +519,11 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -483,10 +_,11 @@
      }
  
      public void flushChannel() {
@@ -112,7 +104,7 @@ index 0f06d509125e72ec11d263d0d5c2179d65f6d8dd..c2bdede413d38ee5b211561f67c98976
          }
      }
  
-@@ -499,53 +537,61 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -500,53 +_,61 @@
  
      // Paper start - Optimize network: Rewrite this to be safer if ran off main thread
      private boolean flushQueue() {
@@ -128,6 +120,7 @@ index 0f06d509125e72ec11d263d0d5c2179d65f6d8dd..c2bdede413d38ee5b211561f67c98976
 -            }
 -        }
 -        return false;
+-    }
 +        return this.processQueue(); // Folia - region threading - connection fixes
 +    }
 +
@@ -138,13 +131,13 @@ index 0f06d509125e72ec11d263d0d5c2179d65f6d8dd..c2bdede413d38ee5b211561f67c98976
 +
 +    private static boolean canWrite(WrappedConsumer queued) {
 +        return queued != null && (!(queued instanceof PacketSendAction packet) || packet.packet.isReady());
-     }
- 
++    }
++
 +    private boolean canWritePackets() {
 +        return canWrite(this.pendingActions.peek());
 +    }
 +    // Folia end - region threading - connection fixes
-+
+ 
      private boolean processQueue() {
 -        if (this.pendingActions.isEmpty()) {
 +        // Folia start - region threading - connection fixes
@@ -162,17 +155,27 @@ index 0f06d509125e72ec11d263d0d5c2179d65f6d8dd..c2bdede413d38ee5b211561f67c98976
 -            if (queued == null) {
 -                return true;
 -            }
+-
+-            if (queued.isConsumed()) {
+-                continue;
+-            }
+-
+-            if (queued instanceof PacketSendAction packetSendAction) {
+-                final Packet<?> packet = packetSendAction.packet;
+-                if (!packet.isReady()) {
 +        while (this.canWritePackets()) {
 +            final boolean set = this.flushingQueue.getAndSet(true);
 +            try {
 +                if (set) {
 +                    // we didn't acquire the lock, break
-+                    return false;
-+                }
- 
--            if (queued.isConsumed()) {
--                continue;
+                     return false;
+                 }
 -            }
+-
+-            iterator.remove();
+-            if (queued.tryMarkConsumed()) {
+-                queued.accept(this);
++
 +                ca.spottedleaf.concurrentutil.collection.MultiThreadedQueue<WrappedConsumer> queue =
 +                    (ca.spottedleaf.concurrentutil.collection.MultiThreadedQueue<WrappedConsumer>)this.pendingActions;
 +                WrappedConsumer holder;
@@ -184,18 +187,10 @@ index 0f06d509125e72ec11d263d0d5c2179d65f6d8dd..c2bdede413d38ee5b211561f67c98976
 +                    if (holder == null) {
 +                        break;
 +                    }
- 
--            if (queued instanceof PacketSendAction packetSendAction) {
--                final Packet<?> packet = packetSendAction.packet;
--                if (!packet.isReady()) {
--                    return false;
++
 +                    holder.accept(this);
-                 }
--            }
- 
--            iterator.remove();
--            if (queued.tryMarkConsumed()) {
--                queued.accept(this);
++                }
++
 +            } finally {
 +                if (!set) {
 +                    this.flushingQueue.set(false);
@@ -208,7 +203,7 @@ index 0f06d509125e72ec11d263d0d5c2179d65f6d8dd..c2bdede413d38ee5b211561f67c98976
      }
      // Paper end - Optimize network
  
-@@ -554,17 +600,43 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -555,17 +_,43 @@
      private static int currTick; // Paper - Buffer joins to world
      public void tick() {
          this.flushQueue();
@@ -216,6 +211,8 @@ index 0f06d509125e72ec11d263d0d5c2179d65f6d8dd..c2bdede413d38ee5b211561f67c98976
 -        if (Connection.currTick != net.minecraft.server.MinecraftServer.currentTick) {
 -            Connection.currTick = net.minecraft.server.MinecraftServer.currentTick;
 -            Connection.joinAttemptsThisTick = 0;
+-        }
+-        // Paper end - Buffer joins to world
 +        // Folia start - this is broken
 +//        // Paper start - Buffer joins to world
 +//        if (Connection.currTick != net.minecraft.server.MinecraftServer.currentTick) {
@@ -243,8 +240,7 @@ index 0f06d509125e72ec11d263d0d5c2179d65f6d8dd..c2bdede413d38ee5b211561f67c98976
 +                this.setReadOnly();
 +                return;
 +            }
-         }
--        // Paper end - Buffer joins to world
++        }
 +        if (!this.isConnected()) {
 +            // disconnected from above
 +            this.handleDisconnection();
@@ -260,7 +256,7 @@ index 0f06d509125e72ec11d263d0d5c2179d65f6d8dd..c2bdede413d38ee5b211561f67c98976
              // Paper start - detailed watchdog information
              net.minecraft.network.PacketProcessor.packetProcessing.push(this.packetListener);
              try {
-@@ -575,7 +647,7 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -576,7 +_,7 @@
              } // Paper end - Buffer joins to world
          }
  
@@ -269,7 +265,7 @@ index 0f06d509125e72ec11d263d0d5c2179d65f6d8dd..c2bdede413d38ee5b211561f67c98976
              this.handleDisconnection();
          }
  
-@@ -626,6 +698,7 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -627,6 +_,7 @@
              this.channel.close().awaitUninterruptibly();
              this.disconnectionDetails = details;
          }
@@ -277,7 +273,7 @@ index 0f06d509125e72ec11d263d0d5c2179d65f6d8dd..c2bdede413d38ee5b211561f67c98976
      }
  
      public boolean isMemoryConnection() {
-@@ -810,10 +883,10 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -822,10 +_,10 @@
  
      public void handleDisconnection() {
          if (this.channel != null && !this.channel.isOpen()) {
@@ -290,7 +286,7 @@ index 0f06d509125e72ec11d263d0d5c2179d65f6d8dd..c2bdede413d38ee5b211561f67c98976
                  PacketListener packetListener = this.getPacketListener();
                  PacketListener disconnectListener = packetListener != null ? packetListener : this.disconnectListener;
                  if (disconnectListener != null) {
-@@ -842,6 +915,21 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -854,6 +_,21 @@
                      }
                  }
                  // Paper end - Add PlayerConnectionCloseEvent
@@ -312,7 +308,7 @@ index 0f06d509125e72ec11d263d0d5c2179d65f6d8dd..c2bdede413d38ee5b211561f67c98976
              }
          }
      }
-@@ -861,15 +949,25 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -881,15 +_,25 @@
      // Paper start - Optimize network
      public void clearPacketQueue() {
          final net.minecraft.server.level.ServerPlayer player = getPlayer();
