@@ -1,14 +1,6 @@
-From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
-From: File <noreply+automated@papermc.io>
-Date: Sun, 20 Apr 1997 15:37:42 +0200
-Subject: [PATCH] folia File Patches
-
-
-diff --git a/net/minecraft/server/commands/RideCommand.java b/net/minecraft/server/commands/RideCommand.java
-index 27af0f90b99459f0e7ab51ee199629b4a72507cf..59e5b876726948e31c0964df641f8027a11b073c 100644
 --- a/net/minecraft/server/commands/RideCommand.java
 +++ b/net/minecraft/server/commands/RideCommand.java
-@@ -50,7 +50,22 @@ public class RideCommand {
+@@ -51,7 +_,22 @@
          );
      }
  
@@ -32,11 +24,11 @@ index 27af0f90b99459f0e7ab51ee199629b4a72507cf..59e5b876726948e31c0964df641f8027
          Entity currentVehicle = target.getVehicle();
          if (currentVehicle != null) {
              throw ERROR_ALREADY_RIDING.create(target.getDisplayName(), currentVehicle.getDisplayName());
-@@ -73,10 +88,21 @@ public class RideCommand {
+@@ -74,10 +_,21 @@
          }
  
          source.sendSuccess(() -> Component.translatable("commands.ride.mount.success", target.getDisplayName(), vehicle.getDisplayName()), true);
--        return 1;
+-        return Command.SINGLE_SUCCESS;
 +        return; // Folia - region threading
 +        // Folia start - region threading
 +            } catch (CommandSyntaxException ex) {
@@ -56,11 +48,11 @@ index 27af0f90b99459f0e7ab51ee199629b4a72507cf..59e5b876726948e31c0964df641f8027
          Entity vehicle = target.getVehicle();
          if (vehicle == null) {
              throw ERROR_NOT_RIDING.create(target.getDisplayName());
-@@ -84,6 +110,13 @@ public class RideCommand {
+@@ -85,6 +_,13 @@
  
          target.stopRiding();
          source.sendSuccess(() -> Component.translatable("commands.ride.dismount.success", target.getDisplayName(), vehicle.getDisplayName()), true);
--        return 1;
+-        return Command.SINGLE_SUCCESS;
 +        return; // Folia - region threading
 +        // Folia start - region threading
 +            } catch (CommandSyntaxException ex) {

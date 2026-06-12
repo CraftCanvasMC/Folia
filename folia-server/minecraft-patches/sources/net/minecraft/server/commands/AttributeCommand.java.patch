@@ -1,14 +1,6 @@
-From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
-From: File <noreply+automated@papermc.io>
-Date: Sun, 20 Apr 1997 15:37:42 +0200
-Subject: [PATCH] folia File Patches
-
-
-diff --git a/net/minecraft/server/commands/AttributeCommand.java b/net/minecraft/server/commands/AttributeCommand.java
-index f01f0cc5624449d3464c14d4f86b60b2e38243b8..0dcf326b17aabecd1d90951ae4e2503b83a3d7dd 100644
 --- a/net/minecraft/server/commands/AttributeCommand.java
 +++ b/net/minecraft/server/commands/AttributeCommand.java
-@@ -256,41 +256,80 @@ public class AttributeCommand {
+@@ -257,41 +_,80 @@
          }
      }
  
@@ -99,7 +91,7 @@ index f01f0cc5624449d3464c14d4f86b60b2e38243b8..0dcf326b17aabecd1d90951ae4e2503b
      }
  
      private static Stream<Identifier> getAttributeModifiers(final Entity target, final Holder<Attribute> attribute) throws CommandSyntaxException {
-@@ -299,11 +338,22 @@ public class AttributeCommand {
+@@ -300,11 +_,22 @@
      }
  
      private static int setAttributeBase(final CommandSourceStack source, final Entity target, final Holder<Attribute> attribute, final double value) throws CommandSyntaxException {
@@ -113,7 +105,7 @@ index f01f0cc5624449d3464c14d4f86b60b2e38243b8..0dcf326b17aabecd1d90951ae4e2503b
 -            () -> Component.translatable("commands.attribute.base_value.set.success", getAttributeDescription(attribute), target.getName(), value), false
 +            () -> Component.translatable("commands.attribute.base_value.set.success", getAttributeDescription(attribute), newTarget.getName(), value), false // Folia - region threading
          );
--        return 1;
+-        return Command.SINGLE_SUCCESS;
 +        return; // Folia - region threading
 +        // Folia start - region threading
 +            } catch (CommandSyntaxException ex) {
@@ -125,7 +117,7 @@ index f01f0cc5624449d3464c14d4f86b60b2e38243b8..0dcf326b17aabecd1d90951ae4e2503b
      }
  
      private static int resetAttributeBase(final CommandSourceStack source, final Entity target, final Holder<Attribute> attribute) throws CommandSyntaxException {
-@@ -327,35 +377,57 @@ public class AttributeCommand {
+@@ -328,35 +_,57 @@
          final double value,
          final AttributeModifier.Operation operation
      ) throws CommandSyntaxException {
@@ -149,7 +141,7 @@ index f01f0cc5624449d3464c14d4f86b60b2e38243b8..0dcf326b17aabecd1d90951ae4e2503b
              ),
              false
          );
--        return 1;
+-        return Command.SINGLE_SUCCESS;
 +        return; // Folia - region threading
 +        // Folia start - region threading
 +            } catch (CommandSyntaxException ex) {
@@ -175,7 +167,7 @@ index f01f0cc5624449d3464c14d4f86b60b2e38243b8..0dcf326b17aabecd1d90951ae4e2503b
                  ),
                  false
              );
--            return 1;
+-            return Command.SINGLE_SUCCESS;
 +            return; // Folia - region threading
          } else {
 -            throw ERROR_NO_SUCH_MODIFIER.create(target.getName(), getAttributeDescription(attribute), id);

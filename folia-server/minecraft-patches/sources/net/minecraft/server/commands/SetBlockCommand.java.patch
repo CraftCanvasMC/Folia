@@ -1,14 +1,6 @@
-From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
-From: File <noreply+automated@papermc.io>
-Date: Sun, 20 Apr 1997 15:37:42 +0200
-Subject: [PATCH] folia File Patches
-
-
-diff --git a/net/minecraft/server/commands/SetBlockCommand.java b/net/minecraft/server/commands/SetBlockCommand.java
-index 81ebcf385148d9ed57c367a99ad2f0c4079989ba..e87dc30f7455d1928714546cc4a9da8c7ec72ba3 100644
 --- a/net/minecraft/server/commands/SetBlockCommand.java
 +++ b/net/minecraft/server/commands/SetBlockCommand.java
-@@ -97,6 +97,12 @@ public class SetBlockCommand {
+@@ -98,6 +_,12 @@
          );
      }
  
@@ -21,7 +13,7 @@ index 81ebcf385148d9ed57c367a99ad2f0c4079989ba..e87dc30f7455d1928714546cc4a9da8c
      private static int setBlock(
          final CommandSourceStack source,
          final BlockPos pos,
-@@ -106,6 +112,11 @@ public class SetBlockCommand {
+@@ -107,6 +_,11 @@
          final boolean strict
      ) throws CommandSyntaxException {
          ServerLevel level = source.getLevel();
@@ -33,17 +25,18 @@ index 81ebcf385148d9ed57c367a99ad2f0c4079989ba..e87dc30f7455d1928714546cc4a9da8c
          if (level.isDebug()) {
              throw ERROR_FAILED.create();
          }
-@@ -133,7 +144,14 @@ public class SetBlockCommand {
+@@ -134,7 +_,14 @@
          }
  
          source.sendSuccess(() -> Component.translatable("commands.setblock.success", pos.getX(), pos.getY(), pos.getZ()), true);
+-        return Command.SINGLE_SUCCESS;
 +        return; // Folia - region threading
 +        // Folia start - region threading
 +                    } catch (CommandSyntaxException ex) {
 +                        sendMessage(source, ex);
 +                    }
 +                });
-         return 1;
++        return 1;
 +        // Folia end - region threading
      }
  

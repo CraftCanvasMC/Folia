@@ -1,14 +1,6 @@
-From 8a1f7b93bacac28f423d2cf4b4c296608196ccc1 Mon Sep 17 00:00:00 2001
-From: File <noreply+automated@papermc.io>
-Date: Sun, 20 Apr 1997 15:37:42 +0200
-Subject: [PATCH] folia File Patches
-
-
-diff --git a/net/minecraft/server/commands/ForceLoadCommand.java b/net/minecraft/server/commands/ForceLoadCommand.java
-index 937005818037b1ce3915db78f8be2cffb2a5db82..7ed711b2dc90fcbaca7be5efbb463dfb330d02a6 100644
 --- a/net/minecraft/server/commands/ForceLoadCommand.java
 +++ b/net/minecraft/server/commands/ForceLoadCommand.java
-@@ -85,7 +85,17 @@ public class ForceLoadCommand {
+@@ -86,7 +_,17 @@
          );
      }
  
@@ -26,11 +18,11 @@ index 937005818037b1ce3915db78f8be2cffb2a5db82..7ed711b2dc90fcbaca7be5efbb463dfb
          ChunkPos chunkPos = pos.toChunkPos();
          ServerLevel level = source.getLevel();
          ResourceKey<Level> dimension = level.dimension();
-@@ -97,14 +107,21 @@ public class ForceLoadCommand {
+@@ -98,14 +_,21 @@
                  ),
                  false
              );
--            return 1;
+-            return Command.SINGLE_SUCCESS;
          } else {
              throw ERROR_NOT_TICKING.create(chunkPos, dimension.identifier());
          }
@@ -49,7 +41,7 @@ index 937005818037b1ce3915db78f8be2cffb2a5db82..7ed711b2dc90fcbaca7be5efbb463dfb
          ResourceKey<Level> dimension = level.dimension();
          LongSet forcedChunks = level.getForceLoadedChunks();
          int chunkCount = forcedChunks.size();
-@@ -123,20 +140,27 @@ public class ForceLoadCommand {
+@@ -124,20 +_,27 @@
          } else {
              source.sendFailure(Component.translatable("commands.forceload.added.none", Component.translationArg(dimension.identifier())));
          }
@@ -78,7 +70,7 @@ index 937005818037b1ce3915db78f8be2cffb2a5db82..7ed711b2dc90fcbaca7be5efbb463dfb
          int minX = Math.min(from.x(), to.x());
          int minZ = Math.min(from.z(), to.z());
          int maxX = Math.max(from.x(), to.x());
-@@ -198,9 +222,16 @@ public class ForceLoadCommand {
+@@ -199,9 +_,16 @@
                  );
              }
  
