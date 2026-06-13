@@ -7,10 +7,10 @@ This allows the player to be re-positioned before logging into
 the world without causing thread checks to trip on Folia.
 
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
-index 16c5f5d2f66dfe7d0bbf49d970bcef8fc95592d2..6c578697abd85109207fffcb5a2be5df15b2f25f 100644
+index 877aed5c6778fb0c00d05c986b4b36a956fd22d1..fbdac12763d45e6b5af323736fc07d71d53563a6 100644
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
-@@ -720,8 +720,18 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -728,8 +728,18 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
          Optional<ValueInput> rootTag = playerInput.child("RootVehicle");
          if (!rootTag.isEmpty()) {
              ServerLevel serverLevel = this.level();
