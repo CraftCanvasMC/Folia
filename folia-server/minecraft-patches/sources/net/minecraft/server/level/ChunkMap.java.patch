@@ -100,7 +100,17 @@
  
              // Paper - rewrite chunk system
          }
-@@ -983,9 +_,9 @@
+@@ -977,15 +_,18 @@
+     }
+ 
+     public boolean hasEntityWithId(final int id) {
+-        return this.entityMap.containsKey(id);
++        // Folia start - region threading
++        Entity entity = this.level.getEntity(id);
++        return entity != null && entity.moonrise$getTrackedEntity() != null;
++        // Folia end - region threading
+     }
+ 
      public void addEntity(final Entity entity) {
          org.spigotmc.AsyncCatcher.catchOp("entity track"); // Spigot
          // Paper start - ignore and warn about illegal addEntity calls instead of crashing server
