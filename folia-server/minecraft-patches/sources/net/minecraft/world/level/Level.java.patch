@@ -39,7 +39,7 @@
 -    public boolean captureBlockStates = false;
 -    public boolean captureTreeGeneration = false;
 -    public Map<BlockPos, org.bukkit.craftbukkit.block.CraftBlockState> capturedBlockStates = new java.util.LinkedHashMap<>(); // Paper
--    public Map<BlockPos, BlockEntity> capturedTileEntities = new java.util.LinkedHashMap<>(); // Paper - Retain block place order when capturing blockstates
+-    public Map<BlockPos, BlockEntity> capturedBlockEntities = new java.util.LinkedHashMap<>(); // Paper - Retain block place order when capturing blockstates
 -    @Nullable
 -    public List<net.minecraft.world.entity.item.ItemEntity> captureDrops;
 +    // Folia - region threading - moved to regionised data
@@ -300,8 +300,8 @@
 +        // Folia end - region threading
          // Paper start - Perf: Optimize capturedTileEntities lookup
          net.minecraft.world.level.block.entity.BlockEntity blockEntity;
--        if (!this.capturedTileEntities.isEmpty() && (blockEntity = this.capturedTileEntities.get(pos)) != null) {
-+        if (!this.getCurrentWorldData().capturedTileEntities.isEmpty() && (blockEntity = this.getCurrentWorldData().capturedTileEntities.get(pos)) != null) { // Folia - region threading
+-        if (!this.capturedBlockEntities.isEmpty() && (blockEntity = this.capturedBlockEntities.get(pos)) != null) {
++        if (!this.getCurrentWorldData().capturedBlockEntities.isEmpty() && (blockEntity = this.getCurrentWorldData().capturedBlockEntities.get(pos)) != null) { // Folia - region threading
              return blockEntity;
          }
          // Paper end - Perf: Optimize capturedTileEntities lookup
@@ -310,9 +310,9 @@
          if (this.isInValidBounds(pos)) {
              // CraftBukkit start
 -            if (this.captureBlockStates) {
--                this.capturedTileEntities.put(pos.immutable(), blockEntity);
+-                this.capturedBlockEntities.put(pos.immutable(), blockEntity);
 +            if (this.getCurrentWorldData().captureBlockStates) { // Folia - region threading
-+                this.getCurrentWorldData().capturedTileEntities.put(pos.immutable(), blockEntity); // Folia - region threading
++                this.getCurrentWorldData().capturedBlockEntities.put(pos.immutable(), blockEntity); // Folia - region threading
                  return;
              }
              // CraftBukkit end

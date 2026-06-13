@@ -39,9 +39,9 @@
 -            this.addEnderPearl(CoordinateUtils.getChunkKey(enderpearl.chunkPosition()));
 +            this.addEnderPearl(CoordinateUtils.getChunkKey(enderpearl.chunkPosition()), enderpearl.getId()); // Folia - region threading
          }
+         entity.registerScheduler(); // Paper - optimise Folia entity scheduler
      }
- 
-@@ -104,21 +_,22 @@
+@@ -105,21 +_,22 @@
              ((ChunkSystemServerLevel)this.serverWorld).moonrise$getNearbyPlayers().removePlayer(player);
          }
          if (entity instanceof ThrownEnderpearl enderpearl) {
@@ -67,7 +67,7 @@
          // Moonrise end - entity tracker
      }
  
-@@ -137,30 +_,22 @@
+@@ -138,30 +_,22 @@
          return PlatformHooks.get().screenEntity(this.serverWorld, entity, fromDisk, event);
      }
  

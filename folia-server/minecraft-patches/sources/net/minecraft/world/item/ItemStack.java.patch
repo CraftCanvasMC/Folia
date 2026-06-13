@@ -25,8 +25,8 @@
 -            capturedBlockStates = new java.util.ArrayList<>(level.capturedBlockStates.values());
 -            level.capturedBlockStates.clear();
 -
--            capturedTileEntities = new java.util.LinkedHashMap<>(level.capturedTileEntities);
--            level.capturedTileEntities.clear();
+-            capturedBlockEntities = new java.util.ArrayList<>(level.capturedBlockEntities.values());
+-            level.capturedBlockEntities.clear();
 -
 -            treeType = net.minecraft.world.level.block.SaplingBlock.treeType;
 -            net.minecraft.world.level.block.SaplingBlock.treeType = null;
@@ -36,8 +36,8 @@
 +            capturedBlockStates = new java.util.ArrayList<>(worldData.capturedBlockStates.values()); // Folia - region threading
 +            worldData.capturedBlockStates.clear(); // Folia - region threading
 +
-+            capturedTileEntities = new java.util.LinkedHashMap<>(worldData.capturedTileEntities); // Folia - region threading
-+            worldData.capturedTileEntities.clear(); // Folia - region threading
++            capturedBlockEntities = new java.util.ArrayList<>(worldData.capturedBlockEntities.values()); // Folia - region threading
++            worldData.capturedBlockEntities.clear(); // Folia - region threading
 +
 +            treeType = net.minecraft.world.level.block.SaplingBlock.treeTypeRT.get(); // Folia - region threading
 +            net.minecraft.world.level.block.SaplingBlock.treeTypeRT.set(null); // Folia - region threading

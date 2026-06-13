@@ -400,7 +400,7 @@
 +    public boolean captureBlockStates = false;
 +    public boolean captureTreeGeneration = false;
 +    public final Map<BlockPos, CraftBlockState> capturedBlockStates = new java.util.LinkedHashMap<>(); // Paper
-+    public final Map<BlockPos, BlockEntity> capturedTileEntities = new java.util.LinkedHashMap<>(); // Paper
++    public final Map<BlockPos, BlockEntity> capturedBlockEntities = new java.util.LinkedHashMap<>(); // Paper
 +    public List<ItemEntity> captureDrops;
 +    // Paper start
 +    public int wakeupInactiveRemainingAnimals;

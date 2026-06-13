@@ -48,8 +48,8 @@
  
      public @Nullable BlockEntity getBlockEntity(final BlockPos pos, final LevelChunk.EntityCreationType creationType) {
          // CraftBukkit start
--        BlockEntity blockEntity = this.level.capturedTileEntities.get(pos);
-+        BlockEntity blockEntity = this.level.getCurrentWorldData().capturedTileEntities.get(pos); // Folia - region threading
+-        BlockEntity blockEntity = this.level.capturedBlockEntities.get(pos);
++        BlockEntity blockEntity = this.level.getCurrentWorldData().capturedBlockEntities.get(pos); // Folia - region threading
          if (blockEntity == null) {
              blockEntity = this.blockEntities.get(pos);
          }
