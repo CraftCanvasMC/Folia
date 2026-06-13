@@ -100,15 +100,12 @@
  
              // Paper - rewrite chunk system
          }
-@@ -977,15 +_,18 @@
+@@ -977,15 +_,15 @@
      }
  
      public boolean hasEntityWithId(final int id) {
 -        return this.entityMap.containsKey(id);
-+        // Folia start - region threading
-+        Entity entity = this.level.getEntity(id);
-+        return entity != null && entity.moonrise$getTrackedEntity() != null;
-+        // Folia end - region threading
++        return false; // Folia - region threading
      }
  
      public void addEntity(final Entity entity) {
