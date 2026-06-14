@@ -9460,7 +9460,7 @@ index c8c8ee85004d965f77a00edb033e1863fc03833a..96a2ea1eb51d4f538ed8c8d8a7137de3
  
      @FunctionalInterface
 diff --git a/net/minecraft/server/commands/ForceLoadCommand.java b/net/minecraft/server/commands/ForceLoadCommand.java
-index 280fe9d389862098747006cf6f2c2f3292c8ad92..cf821609e8ad210142e0ea9db4900af3628d096a 100644
+index 280fe9d389862098747006cf6f2c2f3292c8ad92..d426e93f7f84e48a3e193abfb322d46dcb80d6fa 100644
 --- a/net/minecraft/server/commands/ForceLoadCommand.java
 +++ b/net/minecraft/server/commands/ForceLoadCommand.java
 @@ -86,7 +86,17 @@ public class ForceLoadCommand {
@@ -9494,7 +9494,7 @@ index 280fe9d389862098747006cf6f2c2f3292c8ad92..cf821609e8ad210142e0ea9db4900af3
 +                sendMessage(source, ex);
 +            }
 +        });
-+        return 1;
++        return Command.SINGLE_SUCCESS;
 +        // Folia end - region threading
      }
  
@@ -9511,7 +9511,7 @@ index 280fe9d389862098747006cf6f2c2f3292c8ad92..cf821609e8ad210142e0ea9db4900af3
 +        }); // Folia - region threading
  
 -        return chunkCount;
-+        return 1; // Folia - region threading
++        return Command.SINGLE_SUCCESS; // Folia - region threading
      }
  
      private static int removeAll(final CommandSourceStack source) {
@@ -9547,7 +9547,7 @@ index 280fe9d389862098747006cf6f2c2f3292c8ad92..cf821609e8ad210142e0ea9db4900af3
 +                sendMessage(source, ex);
 +            }
 +        });
-+        return 1;
++        return Command.SINGLE_SUCCESS;
 +        // Folia end - region threading
      }
  }
@@ -9634,7 +9634,7 @@ index ceef214b551114ba030f0f4b4aaf28aaa8013a3f..a4cfbbbe2a2c3219c0dc996f7b8acd5a
  
          if (victims.size() == 1) {
 diff --git a/net/minecraft/server/commands/PlaceCommand.java b/net/minecraft/server/commands/PlaceCommand.java
-index 74f96663bbfec728ea94beab0ce0d81cda4c39bf..b7364ccebbd5188912c7de121db79af7ae24d677 100644
+index 74f96663bbfec728ea94beab0ce0d81cda4c39bf..a28eb4e4c55e33ca9feae68518363c79bc1008eb 100644
 --- a/net/minecraft/server/commands/PlaceCommand.java
 +++ b/net/minecraft/server/commands/PlaceCommand.java
 @@ -250,18 +250,39 @@ public class PlaceCommand {
@@ -9665,7 +9665,6 @@ index 74f96663bbfec728ea94beab0ce0d81cda4c39bf..b7364ccebbd5188912c7de121db79af7
  
          String id = featureHolder.key().identifier().toString();
          source.sendSuccess(() -> Component.translatable("commands.place.feature.success", id, pos.getX(), pos.getY(), pos.getZ()), true);
--        return Command.SINGLE_SUCCESS;
 +        return; // Folia - region threading
 +        // Folia start - region threading
 +                    } catch (CommandSyntaxException ex) {
@@ -9673,7 +9672,7 @@ index 74f96663bbfec728ea94beab0ce0d81cda4c39bf..b7364ccebbd5188912c7de121db79af7
 +                    }
 +                }
 +        );
-+        return 1;
+         return Command.SINGLE_SUCCESS;
 +        // Folia end - region threading
      }
  
@@ -9694,7 +9693,6 @@ index 74f96663bbfec728ea94beab0ce0d81cda4c39bf..b7364ccebbd5188912c7de121db79af7
          }
  
          source.sendSuccess(() -> Component.translatable("commands.place.jigsaw.success", pos.getX(), pos.getY(), pos.getZ()), true);
--        return Command.SINGLE_SUCCESS;
 +        return; // Folia - region threading
 +        // Folia start - region threading
 +                    } catch (CommandSyntaxException ex) {
@@ -9702,7 +9700,7 @@ index 74f96663bbfec728ea94beab0ce0d81cda4c39bf..b7364ccebbd5188912c7de121db79af7
 +                    }
 +                }
 +        );
-+        return 1;
+         return Command.SINGLE_SUCCESS;
 +        // Folia end - region threading
      }
  
@@ -9724,7 +9722,6 @@ index 74f96663bbfec728ea94beab0ce0d81cda4c39bf..b7364ccebbd5188912c7de121db79af7
              );
          String id = structureHolder.key().identifier().toString();
          source.sendSuccess(() -> Component.translatable("commands.place.structure.success", id, pos.getX(), pos.getY(), pos.getZ()), true);
--        return Command.SINGLE_SUCCESS;
 +        return; // Folia - region threading
 +        // Folia start - region threading
 +                    } catch (CommandSyntaxException ex) {
@@ -9732,7 +9729,7 @@ index 74f96663bbfec728ea94beab0ce0d81cda4c39bf..b7364ccebbd5188912c7de121db79af7
 +                    }
 +                }
 +        );
-+        return 1;
+         return Command.SINGLE_SUCCESS;
 +        // Folia end - region threading
      }
  
@@ -9755,7 +9752,6 @@ index 74f96663bbfec728ea94beab0ce0d81cda4c39bf..b7364ccebbd5188912c7de121db79af7
          source.sendSuccess(
              () -> Component.translatable("commands.place.template.success", Component.translationArg(template), pos.getX(), pos.getY(), pos.getZ()), true
          );
--        return Command.SINGLE_SUCCESS;
 +        return; // Folia - region threading
 +        // Folia start - region threading
 +                    } catch (CommandSyntaxException ex) {
@@ -9763,7 +9759,7 @@ index 74f96663bbfec728ea94beab0ce0d81cda4c39bf..b7364ccebbd5188912c7de121db79af7
 +                    }
 +                }
 +        );
-+        return 1;
+         return Command.SINGLE_SUCCESS;
 +        // Folia end - region threading
      }
  
@@ -9868,7 +9864,7 @@ index cce58467d18985b149195629e421969ca6de3d54..2f6c0784126e1ab22ca7e138452325eb
      }
  }
 diff --git a/net/minecraft/server/commands/RotateCommand.java b/net/minecraft/server/commands/RotateCommand.java
-index 8bacd793822528f2b96387b2264dbf42fab5d8f7..39f7c9b503ed8da232a1fd3a3766bbec653e7b1a 100644
+index 8bacd793822528f2b96387b2264dbf42fab5d8f7..d320fb963a3dee8dc01f3a3b6a367499e46407fb 100644
 --- a/net/minecraft/server/commands/RotateCommand.java
 +++ b/net/minecraft/server/commands/RotateCommand.java
 @@ -67,18 +67,22 @@ public class RotateCommand {
@@ -9883,9 +9879,8 @@ index 8bacd793822528f2b96387b2264dbf42fab5d8f7..39f7c9b503ed8da232a1fd3a3766bbec
          float relativeOrAbsoluteXRot = rotation.isXRelative() ? rot.x - entity.getXRot() : rot.x;
          entity.forceSetRotation(relativeOrAbsoluteYRot, rotation.isYRelative(), relativeOrAbsoluteXRot, rotation.isXRelative());
          source.sendSuccess(() -> Component.translatable("commands.rotate.success", entity.getDisplayName()), true);
--        return Command.SINGLE_SUCCESS;
 +        }); // Folia - region threading
-+        return 1;
+         return Command.SINGLE_SUCCESS;
      }
  
 -    private static int rotate(final CommandSourceStack source, final Entity entity, final LookAt facing) {
@@ -9893,13 +9888,12 @@ index 8bacd793822528f2b96387b2264dbf42fab5d8f7..39f7c9b503ed8da232a1fd3a3766bbec
 +        entityOld.getBukkitEntity().taskScheduler.scheduleOrExecute((Entity entity) -> { // Folia - region threading
          facing.perform(source, entity);
          source.sendSuccess(() -> Component.translatable("commands.rotate.success", entity.getDisplayName()), true);
--        return Command.SINGLE_SUCCESS;
 +        }); // Folia - region threading
-+        return 1;
+         return Command.SINGLE_SUCCESS;
      }
  }
 diff --git a/net/minecraft/server/commands/SetBlockCommand.java b/net/minecraft/server/commands/SetBlockCommand.java
-index 785112128803792e1ce821d3da37d6bac6cd3f44..58c1e1b6e01f10a234ef64cebb93fcab1213ac5f 100644
+index 785112128803792e1ce821d3da37d6bac6cd3f44..ec789ef9bebab2743647d2e73d6a6e810e0d7a43 100644
 --- a/net/minecraft/server/commands/SetBlockCommand.java
 +++ b/net/minecraft/server/commands/SetBlockCommand.java
 @@ -98,6 +98,12 @@ public class SetBlockCommand {
@@ -9931,14 +9925,13 @@ index 785112128803792e1ce821d3da37d6bac6cd3f44..58c1e1b6e01f10a234ef64cebb93fcab
          }
  
          source.sendSuccess(() -> Component.translatable("commands.setblock.success", pos.getX(), pos.getY(), pos.getZ()), true);
--        return Command.SINGLE_SUCCESS;
 +        return; // Folia - region threading
 +        // Folia start - region threading
 +                    } catch (CommandSyntaxException ex) {
 +                        sendMessage(source, ex);
 +                    }
 +                });
-+        return 1;
+         return Command.SINGLE_SUCCESS;
 +        // Folia end - region threading
      }
  
@@ -10032,7 +10025,7 @@ index 290547abf7037c5c88736c66765b2ee8f575c53b..369be2ad59cf05c76a44b4b00bec18d1
              if (lookAt != null) {
                  lookAt.perform(source, victim);
 diff --git a/net/minecraft/server/commands/TimeCommand.java b/net/minecraft/server/commands/TimeCommand.java
-index 27ec27001aad55c9e1c691e3910c08a57b3322c9..7aa4dce2e02ce28390a9b02f6ea039b2adf55d01 100644
+index 27ec27001aad55c9e1c691e3910c08a57b3322c9..174c3a671c3cfd276efc08add9d9dc59f0bd655b 100644
 --- a/net/minecraft/server/commands/TimeCommand.java
 +++ b/net/minecraft/server/commands/TimeCommand.java
 @@ -116,6 +116,12 @@ public class TimeCommand {
@@ -10124,7 +10117,7 @@ index 27ec27001aad55c9e1c691e3910c08a57b3322c9..7aa4dce2e02ce28390a9b02f6ea039b2
          // Paper start - per-world time
          ServerClockManager clockManager = source.getLevel().clockManager();
          java.util.OptionalLong targetTime = clockManager.getTotalTicksToTimeMarker(clock, timeMarkerId);
-@@ -214,19 +234,30 @@ public class TimeCommand {
+@@ -214,18 +234,29 @@ public class TimeCommand {
          }
          // Paper end - per-world time
          source.sendSuccess(() -> Component.translatable("commands.time.set.time_marker", clock.getRegisteredName(), timeMarkerId.identifier().toString()), true);
@@ -10143,21 +10136,18 @@ index 27ec27001aad55c9e1c691e3910c08a57b3322c9..7aa4dce2e02ce28390a9b02f6ea039b2
 +        io.papermc.paper.threadedregions.RegionizedServer.getInstance().addTask(() -> { // Folia - region threading
          source.getLevel().clockManager().setPaused(clock, paused); // Paper - per-world time
          source.sendSuccess(() -> Component.translatable(paused ? "commands.time.pause" : "commands.time.resume", clock.getRegisteredName()), true);
--        return Command.SINGLE_SUCCESS;
 +        }); // Folia - region threading
-+        return 1;
+         return Command.SINGLE_SUCCESS;
      }
  
      private static int setRate(final CommandSourceStack source, final Holder<WorldClock> clock, final float rate) {
 +        io.papermc.paper.threadedregions.RegionizedServer.getInstance().addTask(() -> { // Folia - region threading
          source.getLevel().clockManager().setRate(clock, rate); // Paper - per-world time
          source.sendSuccess(() -> Component.translatable("commands.time.rate", clock.getRegisteredName(), rate), true);
--        return Command.SINGLE_SUCCESS;
 +        }); // Folia - region threading
-+        return 1;
+         return Command.SINGLE_SUCCESS;
      }
  
-     private static int wrapTime(final long ticks) {
 diff --git a/net/minecraft/server/commands/WeatherCommand.java b/net/minecraft/server/commands/WeatherCommand.java
 index 54d700de142e6d9ee1548267ea747de154dcea63..d0826acd4de70a7030d408faeb42903900bbbb74 100644
 --- a/net/minecraft/server/commands/WeatherCommand.java
