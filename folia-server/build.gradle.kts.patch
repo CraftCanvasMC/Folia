@@ -31,7 +31,7 @@
  
      updatingMinecraft {
          // oldPaperCommit = "d4fe85375af18bfa88f44d7c1e6a61904ae550cc"
-+        oldForkCommit = "5a323074be706405a71e73b68bd90d157430263a"
++        // oldForkCommit = "5a323074be706405a71e73b68bd90d157430263a"
      }
  }
  
