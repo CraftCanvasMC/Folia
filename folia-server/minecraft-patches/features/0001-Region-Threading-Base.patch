@@ -8847,6 +8847,38 @@ index 3c4fb4eb8e543df49b285fc738aa3eee0df58584..e0379ffb6b59118aa80170f280094a2a
      }
      // Paper end - API to check if the server is sleeping
  }
+diff --git a/net/minecraft/server/commands/AdvancementCommands.java b/net/minecraft/server/commands/AdvancementCommands.java
+index 5a1962613f80d2384fa28e9a6d4ddc601ff05c70..dfabf9b9870091087ab8b48634ecf9e2316b7f68 100644
+--- a/net/minecraft/server/commands/AdvancementCommands.java
++++ b/net/minecraft/server/commands/AdvancementCommands.java
+@@ -242,7 +242,12 @@ public class AdvancementCommands {
+         int playerCount = 0;
+ 
+         for (ServerPlayer player : players) {
+-            int changedAdvancements = action.perform(player, advancements, showAdvancements);
++            // Folia start - region threading
++            int changedAdvancements = 1;
++            player.getBukkitEntity().taskScheduler.scheduleOrExecute((ServerPlayer newPlayer) -> {
++                action.perform(newPlayer, advancements, showAdvancements);
++            });
++            // Folia end - region threading
+             if (changedAdvancements > 0) {
+                 playerCount++;
+             }
+@@ -314,7 +319,12 @@ public class AdvancementCommands {
+         }
+ 
+         for (ServerPlayer player : players) {
+-            if (action.performCriterion(player, holder, criterion)) {
++            // Folia start - region threading
++            player.getBukkitEntity().taskScheduler.scheduleOrExecute((ServerPlayer newPlayer) -> {
++                action.performCriterion(newPlayer, holder, criterion);
++            });
++            if (true) {
++            // Folia end - region threading
+                 playerCount++;
+             }
+         }
 diff --git a/net/minecraft/server/commands/AttributeCommand.java b/net/minecraft/server/commands/AttributeCommand.java
 index eef8d1be3f820921a424baf0beb7a4f304fc86cb..1aead2cd0b8fa8e61ba4820ec116ec9e0a5c0bfe 100644
 --- a/net/minecraft/server/commands/AttributeCommand.java
