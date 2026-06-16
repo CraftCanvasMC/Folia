@@ -19,7 +19,7 @@ index c96c38d3fe7c48a4c9e02bfe7daef006cb4eeafa..f2329d1a9d9d4bf4c9d771e25e54f2f9
  
          if (this.state == ServerLoginPacketListenerImpl.State.WAITING_FOR_DUPE_DISCONNECT
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index 1fdd9ee0bb61cb540eb1cba272fa7ab2df53c230..f48c65186c2582b5486278cf4b019f5e90cc09d1 100644
+index e2641afc94b5365cd1c61836a90c629d07377fd8..fad089ab41684a2febcc0cfd3425ae7f835a570f 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
 @@ -149,6 +149,17 @@ public abstract class PlayerList {
